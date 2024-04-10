@@ -12,7 +12,7 @@ import random
 from tools import playlist
 from tools import logger
 Commands = ['recents', 'info', 'createteam', 'showid', 'hideid', 'lm', 'gp', 'party', 'quit', 'kickvote', 'maxplayers', 'playlist', 'ban', 'kick', 'remove', 'end', 'quit', 'mute', 'unmute', 'slowmo', 'nv', 'dv', 'pause',
-            'cameramode', 'createrole', 'addrole', 'removerole', 'addcommand', 'addcmd', 'removecommand', 'getroles', 'removecmd', 'changetag', 'customtag', 'customeffect', 'removeeffect', 'removetag' 'add', 'spectators', 'lobbytime']
+            'cameramode', 'createrole', 'addrole', 'removerole', 'addcommand', 'addcmd', 'removecommand', 'getroles', 'removecmd', 'changetag', 'customtag', 'customeffect', 'removeeffect', 'removetag', 'add', 'spectators', 'lobbytime']
 CommandAliases = ['max', 'rm', 'next', 'restart', 'mutechat', 'unmutechat', 'sm',
                   'slow', 'night', 'day', 'pausegame', 'camera_mode', 'rotate_camera', 'effect']
 
