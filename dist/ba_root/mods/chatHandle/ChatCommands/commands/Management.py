@@ -11,7 +11,7 @@ import _thread
 import random
 from tools import playlist
 from tools import logger
-Commands = ['recents', 'info', 'createteam', 'showid', 'hideid', 'lm', 'gp', 'party', 'quit', 'kickvote', 'maxplayers', 'playlist', 'ban', 'kick', 'remove', 'end', 'quit', 'mute', 'unmute', 'slowmo', 'nv', 'dv', 'pause',
+Commands = ['recents', 'info', 'createteam', 'showid', 'hideid', 'lm', 'gp', 'party', 'quit', 'kickvote', 'maxplayers', 'playlist', 'ban', 'kick', 'remove', 'end', 'quit', 'mute', 'unmute', 'slowmo', 'nv', 'dv', 'pause', 'tint',
             'cameramode', 'createrole', 'addrole', 'removerole', 'addcommand', 'addcmd', 'removecommand', 'getroles', 'removecmd', 'changetag', 'customtag', 'customeffect', 'removeeffect', 'removetag', 'add', 'spectators', 'lobbytime']
 CommandAliases = ['max', 'rm', 'next', 'restart', 'mutechat', 'unmutechat', 'sm',
                   'slow', 'night', 'day', 'pausegame', 'camera_mode', 'rotate_camera', 'effect']
@@ -81,6 +81,9 @@ def ExcelCommand(command, arguments, clientid, accountid):
 
     elif command in ['dv', 'day']:
         dv(arguments)
+    
+    elif command == 'tint':
+        tint(arguments)
 
     elif command in ['pause', 'pausegame']:
         pause()
@@ -406,6 +409,15 @@ def dv(arguments):
             return
         else:
             pass
+
+
+def tint(arguments):
+
+    activity = _ba.get_foreground_host_activity()
+
+    if len(arguments) == 3:
+        if all(isinstance(val, (int,float)) for val in arguments):
+            activity.globalsnode.tint = (arguments[0], arguments[1], arguments[2])
 
 
 def pause():
