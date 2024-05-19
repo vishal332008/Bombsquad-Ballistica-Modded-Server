@@ -218,9 +218,9 @@ class UpdateThread(threading.Thread):
         except:
             stats = {}
 
-        # now add this batch of kills to our persistant stats
+        # now add this batch of kills to our persistent stats
         for account_id, kill_count in self._account_kills.items():
-            # add a new entry for any accounts that dont have one
+            # add a new entry for any accounts that don't have one
             if account_id not in stats:
                 # also lets ask the master-server for their account-display-str.
                 # (we only do this when first creating the entry to save time,
@@ -228,7 +228,7 @@ class UpdateThread(threading.Thread):
                 # it may change)
 
                 stats[account_id] = {'rank': 0,
-                                     'name': "deafult name",
+                                     'name': "default name",
                                      'scores': 0,
                                      'total_damage': 0,
                                      'kills': 0,

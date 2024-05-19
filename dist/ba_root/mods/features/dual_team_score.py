@@ -200,7 +200,7 @@ def show_player_scores(self,
 
     is_two_team = True if len(self.session.sessionteams) == 2 else False
 
-    def _get_prec_score(p_rec: bs.PlayerRecord) -> Optional[int]:
+    def _get_prec_score(p_rec: bs.PlayerRecord) -> int | None:
         if is_free_for_all and results is not None:
             assert isinstance(results, bs.GameResults)
             assert p_rec.team.activityteam is not None
@@ -208,7 +208,7 @@ def show_player_scores(self,
             return val
         return p_rec.accumscore
 
-    def _get_prec_score_str(p_rec: bs.PlayerRecord) -> Union[str, babase.Lstr]:
+    def _get_prec_score_str(p_rec: bs.PlayerRecord) -> str | bs.Lstr:
         if is_free_for_all and results is not None:
             assert isinstance(results, bs.GameResults)
             assert p_rec.team.activityteam is not None
@@ -228,7 +228,7 @@ def show_player_scores(self,
         valid_players = list(self.stats.get_records().items())
 
         def _get_player_score_set_entry(
-            player: bs.SessionPlayer) -> Optional[bs.PlayerRecord]:
+            player: bs.SessionPlayer) -> bs.PlayerRecord | None:
             for p_rec in valid_players:
                 if p_rec[1].player is player:
                     return p_rec[1]
@@ -264,7 +264,7 @@ def show_player_scores(self,
              text: babase.Lstr,
              h_align: Text.HAlign = Text.HAlign.RIGHT,
              extrascale: float = 1.0,
-             maxwidth: Optional[float] = 120.0) -> None:
+             maxwidth: float | None = 120.0) -> None:
         Text(text,
              color=(0.5, 0.5, 0.6, 0.5),
              position=(ts_h_offs + xoffs * scale,
@@ -324,7 +324,7 @@ def show_player_scores(self,
         topkillcount = max(topkillcount, prec.accum_kill_count)
         topkilledcount = min(topkilledcount, prec.accum_killed_count)
 
-    def _scoretxt(text: Union[str, babase.Lstr],
+    def _scoretxt(text: str | bs.Lstr,
                   x_offs: float,
                   highlight: bool,
                   delay2: float,

@@ -13,9 +13,9 @@ import shutil
 import threading
 import time
 from dataclasses import dataclass, field
-
+from urllib.parse import urlparse
+import http.client
 import _babase
-import requests
 import setting
 from typing import TYPE_CHECKING
 
@@ -150,8 +150,14 @@ def send_webhook_message():
         headers = {
             "Content-Type": "application/json"
         }
-        response = requests.post(
-            WEBHOOK_URL, data=json.dumps(payload), headers=headers)
+        try:
+            url = urlparse(WEBHOOK_URL)
+            conn = http.client.HTTPSConnection(url.netloc)
+            conn.request("POST", url.path, body=json.dumps(payload), headers=headers)
+            response = conn.getresponse()
+            response_data = response.read()
+        except:
+            pass
 
 
 def schedule_webhook():

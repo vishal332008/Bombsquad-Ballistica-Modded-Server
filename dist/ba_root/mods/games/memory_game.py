@@ -63,7 +63,7 @@ class OnTimer(bs.Actor):
             endtime = bs.time()
 
         if self._starttime_ms is None:
-            logging.warning(
+            print(
                 'OnScreenTimer.stop() called without first calling start()'
             )
         else:

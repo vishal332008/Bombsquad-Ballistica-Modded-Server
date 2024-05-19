@@ -103,7 +103,7 @@ def player_joined(pb_id):
                     sub, {
                         "notification": {
                             "title": f'{subscribed_players[pb_id]["name"]} is playing now',
-                            "body": f'Join {_babase.app.server._config.party_name} server {subscribed_players[pb_id]["name"]} is waiting for you ',
+                            "body": f'Join {_babase.app.classic.server._config.party_name} server {subscribed_players[pb_id]["name"]} is waiting for you ',
                             "icon": "assets/icons/icon-96x96.png",
                             "vibrate": [100, 50, 100],
                             "requireInteraction": True,

@@ -12,7 +12,6 @@ import math
 
 from typing import TYPE_CHECKING
 
-import babase
 import bascenev1 as bs
 import bascenev1lib
 from bascenev1lib.actor.spaz import Spaz

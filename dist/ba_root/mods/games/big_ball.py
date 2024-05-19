@@ -49,7 +49,7 @@ class FlagKale(bs.Actor):
         elif isinstance(m, bs.OutOfBoundsMessage):
             self.handlemessage(bs.DieMessage())
         else:
-            super().handlemessage(msg)
+            super().handlemessage(m)
 
 
 class Puck(bs.Actor):

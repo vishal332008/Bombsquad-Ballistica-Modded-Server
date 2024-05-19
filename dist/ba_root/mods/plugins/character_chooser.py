@@ -153,7 +153,7 @@ def _set_ready(self, ready: bool) -> None:
 
     # Handle '_edit' as a special case.
     if profilename == '_edit' and ready:
-        with _babase.Context('ui'):
+        with babase.ContextRef.empty():
             pbrowser.ProfileBrowserWindow(in_main_menu=False)
 
             # Give their input-device UI ownership too
@@ -161,7 +161,7 @@ def _set_ready(self, ready: bool) -> None:
             _babase.set_ui_input_device(self._sessionplayer.inputdevice)
         return
 
-    if ready == False:
+    if not ready:
         self._sessionplayer.assigninput(
             babase.InputType.LEFT_PRESS,
             Call(self.handlemessage, ChangeMessage('team', -1)))

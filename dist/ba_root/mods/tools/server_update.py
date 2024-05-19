@@ -1,14 +1,14 @@
 import _thread
+import http.client
 import json
 import time
 import urllib.request
-
-import requests
-from playersdata import pdata
+from urllib.parse import urlparse
 
 import babase
 import bascenev1
 from efro.terminal import Clr
+from playersdata import pdata
 
 VERSION = 71
 
@@ -38,15 +38,22 @@ def postStatus():
     link = 'https://bcsservers.ballistica.workers.dev/ping'
     data = {'name': babase.app.classic.server._config.party_name,
             'port': str(bascenev1.get_game_port()),
-            'build': babase.app.build_number,
+            'build': babase.app.env.engine_build_number,
             'bcsversion': VERSION}
     _thread.start_new_thread(postRequest, (link, data,))
 
 
 def postRequest(link, data):
     try:
-        res = requests.post(link,
-                            json=data)
+        url = urlparse(link)
+        conn = http.client.HTTPSConnection(url.netloc)
+        json_payload = json.dumps(data)
+        headers = {
+            "Content-Type": "application/json"
+        }
+        conn.request("POST", url.path, body=json_payload, headers=headers)
+        response = conn.getresponse()
+        response_data = response.read()
     except:
         pass
 
@@ -54,9 +61,15 @@ def postRequest(link, data):
 def checkSpammer(data):
     def checkMaster(data):
         try:
-            res = requests.post(
-                'https://bcsservers.ballistica.workers.dev/checkspammer',
-                json=data)
+            url = urlparse('https://bcsservers.ballistica.workers.dev/checkspammer')
+            conn = http.client.HTTPSConnection(url.netloc)
+            json_payload = json.dumps(data)
+            headers = {
+                "Content-Type": "application/json"
+            }
+            conn.request("POST", url.path, body=json_payload, headers=headers)
+            response = conn.getresponse()
+            response_data = response.read()
         except:
             pass
         # TODO handle response and kick player based on status
@@ -67,15 +80,13 @@ def checkSpammer(data):
 
 def fetchChangelogs():
     url = "https://raw.githubusercontent.com/imayushsaini/Bombsquad-Ballistica-Modded-Server/public-server/dist/ba_root/mods/changelogs.json"
-
-    if 2 * 2 == 4:
-        try:
-            data = urllib.request.urlopen(url)
-            changelog = json.loads(data.read())
-        except:
-            return None
-        else:
-            return changelog
+    try:
+        data = urllib.request.urlopen(url)
+        changelog = json.loads(data.read())
+    except:
+        return None
+    else:
+        return changelog
 
 
 def checkChangelog():

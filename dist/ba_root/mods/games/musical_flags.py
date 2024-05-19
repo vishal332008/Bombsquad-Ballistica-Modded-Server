@@ -15,6 +15,7 @@ import random
 
 from typing import TYPE_CHECKING
 
+import bascenev1
 import bascenev1 as bs
 from bascenev1lib.actor.flag import Flag, FlagPickedUpMessage
 from bascenev1lib.actor.playerspaz import PlayerSpaz
@@ -42,7 +43,7 @@ class MFGame(bs.TeamGameActivity[Player, Team]):
 
     @classmethod
     def get_available_settings(
-        cls, sessiontype: Type[bs.Session]) -> List[babase.Setting]:
+        cls, sessiontype: Type[bs.Session]) -> list[bascenev1.Setting]:
         settings = [
             bs.IntSetting(
                 'Max Round Time',

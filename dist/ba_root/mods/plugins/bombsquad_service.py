@@ -4,11 +4,12 @@ import os
 from datetime import datetime
 
 import _babase
+import bascenev1
 import setting
 import yaml
-from babase._gameactivity import GameActivity
-from playersData import pdata
-from serverData import serverdata
+
+from playersdata import pdata
+from serverdata import serverdata
 from stats import mystats
 from typing import Type
 
@@ -26,7 +27,7 @@ serverinfo = {}
 class BsDataThread(object):
     def __init__(self):
         global stats
-        stats["name"] = _babase.app.server._config.party_name
+        stats["name"] = _babase.app.classic.server._config.party_name
         stats["discord"] = "https://discord.gg/ucyaesh"
         stats["vapidKey"] = notification_manager.get_vapid_keys()["public_key"]
 
@@ -71,7 +72,7 @@ class BsDataThread(object):
             ).get_next_game_description().evaluate()
 
             current_game_spec = bs.get_foreground_host_session()._current_game_spec
-            gametype: Type[GameActivity] = current_game_spec['resolved_type']
+            gametype: Type[bascenev1.GameActivity] = current_game_spec['resolved_type']
 
             currentMap = gametype.get_settings_display_string(
                 current_game_spec).evaluate()
@@ -97,7 +98,7 @@ class BsDataThread(object):
             teams = session.sessionteams
             for team in teams:
                 data[str(team.id)] = {'name': team.name if isinstance(team.name,
-                                                                      str) else team.name.evaluate(),
+                                                                      str) else team.name,
                                       'color': list(team.color),
                                       'score': team.customdata['score'],
                                       'players': []
@@ -265,7 +266,7 @@ def disable_kick_vote(account_id, duration):
 
 
 def get_server_config():
-    return _babase.app.server._config.__dict__
+    return _babase.app.classic.server._config.__dict__
 
 
 def update_server_config(config):
@@ -278,7 +279,7 @@ def update_server_config(config):
 
 def do_action(action, value):
     if action == "message":
-        _babase.pushcall(babase.Call(_babase.chatmessage, value),
+        _babase.pushcall(babase.Call(bs.chatmessage, value),
                          from_other_thread=True)
     elif action == "quit":
         _babase.pushcall(babase.Call(_babase.quit), from_other_thread=True)

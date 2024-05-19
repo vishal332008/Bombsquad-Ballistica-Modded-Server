@@ -41,7 +41,7 @@ from spazmod import modifyspaz
 from stats import mystats
 from tools import account
 from tools import notification_manager
-from tools import servercheck, ServerUpdate, logger, playlist, servercontroller
+from tools import servercheck, server_update, logger, playlist, servercontroller
 
 if TYPE_CHECKING:
     from typing import Any
@@ -63,7 +63,7 @@ class modSetup(babase.Plugin):
         plus = bui.app.plus
         bootstraping()
         servercheck.checkserver().start()
-        ServerUpdate.check()
+        server_update.check()
         # bs.apptimer(5, account.updateOwnerIps)
         if settings["afk_remover"]['enable']:
             afk_check.checkIdle().start()

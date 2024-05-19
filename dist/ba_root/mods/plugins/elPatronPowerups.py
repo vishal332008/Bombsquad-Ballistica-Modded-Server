@@ -315,7 +315,7 @@ class BearStore:
     def __init__(self,
                  price: int = 1000,
                  value: str = '',
-                 callback: call = None):
+                 callback: Callable[[], None] = None):
 
         self.price = price
         self.value = value

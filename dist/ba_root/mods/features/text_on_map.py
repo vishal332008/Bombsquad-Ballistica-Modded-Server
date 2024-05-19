@@ -134,21 +134,21 @@ class textonmap:
             if setti["leaderboard"]["barsBehindName"]:
                 self.ss1 = bs.newnode('image', attrs={'scale': (300, 30),
                                                       'texture': bs.gettexture(
-                                                          'bar'),
+                                                          'uiAtlas2'),
                                                       'position': (0, -80),
                                                       'attach': 'topRight',
                                                       'opacity': 0.5,
                                                       'color': (0.7, 0.1, 0)})
                 self.ss1 = bs.newnode('image', attrs={'scale': (300, 30),
                                                       'texture': bs.gettexture(
-                                                          'bar'),
+                                                          'uiAtlas2'),
                                                       'position': (0, -115),
                                                       'attach': 'topRight',
                                                       'opacity': 0.5,
                                                       'color': (0.6, 0.6, 0.6)})
                 self.ss1 = bs.newnode('image', attrs={'scale': (300, 30),
                                                       'texture': bs.gettexture(
-                                                          'bar'),
+                                                          'uiAtlas2'),
                                                       'position': (0, -150),
                                                       'attach': 'topRight',
                                                       'opacity': 0.5,

@@ -556,7 +556,10 @@ def on_begin(self, *args, **kwargs) -> None:
 # ba_meta export plugin
 class byHeySmoothy(babase.Plugin):
     def on_app_running(self):
-        bui.set_party_icon_always_visible(True)
+        try:
+            bui.set_party_icon_always_visible(True)
+        except:
+            pass
         bs._activity.Activity.on_begin = on_begin
         # _babase.chatmessage = new_chatmessage
         bascenev1lib.actor.playerspaz.PlayerSpaz = NewPlayerSpaz

@@ -1,4 +1,4 @@
-#!/usr/bin/env -S python3.12 -O
+#!/usr/bin/env python3.12
 # Released under the MIT License. See LICENSE for details.
 #
 # pylint: disable=too-many-lines
@@ -12,6 +12,7 @@ import json
 import signal
 import tomllib
 import subprocess
+import platform
 from pathlib import Path
 from threading import Lock, Thread, current_thread
 from typing import TYPE_CHECKING
@@ -168,7 +169,6 @@ class ServerManagerApp:
         )
 
         # Python will handle SIGINT for us (as KeyboardInterrupt) but we
-        # need to register a SIGTERM handler so we have a chance to clean
         # need to register a SIGTERM handler so we have a chance to
         # clean up our subprocess when someone tells us to die. (and
         # avoid zombie processes)
