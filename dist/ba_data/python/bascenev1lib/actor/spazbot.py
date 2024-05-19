@@ -8,9 +8,8 @@ from __future__ import annotations
 import random
 import weakref
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
-from typing_extensions import override
 import bascenev1 as bs
 from bascenev1lib.actor.spaz import Spaz
 
@@ -776,7 +775,6 @@ class ChargerBotPro(ChargerBot):
 
     color = PRO_BOT_COLOR
     highlight = PRO_BOT_HIGHLIGHT
-    default_shields = True
     default_boxing_gloves = True
     points_mult = 3
 

@@ -8,9 +8,8 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
-from typing_extensions import override
 import bascenev1 as bs
 
 from bascenev1lib.actor.bomb import Bomb
@@ -73,6 +72,7 @@ class MeteorShowerGame(bs.TeamGameActivity[Player, Team]):
         self._last_player_death_time: float | None = None
         self._meteor_time = 2.0
         self._timer: OnScreenTimer | None = None
+        self._ended: bool = False
 
         # Some base class overrides:
         self.default_music = (
@@ -161,6 +161,10 @@ class MeteorShowerGame(bs.TeamGameActivity[Player, Team]):
         return None
 
     def _check_end_game(self) -> None:
+        # We don't want to end this activity more than once.
+        if self._ended:
+            return
+
         living_team_count = 0
         for team in self.teams:
             for player in team.players:
@@ -270,4 +274,5 @@ class MeteorShowerGame(bs.TeamGameActivity[Player, Team]):
             # Submit the score value in milliseconds.
             results.set_team_score(team, int(1000.0 * longest_life))
 
+        self._ended = True
         self.end(results=results)

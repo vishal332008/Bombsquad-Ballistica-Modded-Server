@@ -1,6 +1,6 @@
 {
   "accountSettingsWindow": {
-    "accountNameRules": ".لا يمكن لاسماء الحِسابَات أن تحتوي على رموز تعبيرية أو حروف غير ألفبائية",
+    "accountNameRules": "لا يمكن أن تحتوي أسماء الحسابات على رموز تعبيرية أو أحرف خاصة أخرى",
     "accountProfileText": "معلومات اللاعبين",
     "accountsText": "حسابات",
     "achievementProgressText": "${TOTAL} من أصل ${COUNT} إنجازاتك: أنجزت",
@@ -8,13 +8,13 @@
     "changeOncePerSeason": "يمكنك تغييره مرة واحدة في الموسم",
     "changeOncePerSeasonError": "يجب عليك الانتظار حتى الموسم القادم لتغيير هذا مجددا (${NUM} أيام )",
     "customName": "الاسم المخصص",
-    "googlePlayGamesAccountSwitchText": "اذا اردت استخدام حساب غوغل بلاي اخر،\nقم بإستعمال تطبيق غوغل بلاي العاب لتحويله.",
+    "googlePlayGamesAccountSwitchText": "اذا اردت استخدام حساب غوغل بلاي اخر،\nقم بإستعمال تطبيق العاب غوغل بلاي لتحويله.",
     "linkAccountsEnterCodeText": "ادخل الرمز",
     "linkAccountsGenerateCodeText": "انشئ رمز",
     "linkAccountsInfoText": "(مشاركة تقدمك مع الاجهزة الاخرى)",
     "linkAccountsInstructionsNewText": "لربط حسابين،- انشئ رمز من الجهاز المراد انشاء الحساب فيه\n- وقم بإدخال الرمز في الجهاز الآخر\n\nالبيانات من الحساب الأول سوف يتم مشاركتها بين الجهازين\n\n  من الحسابات كحد أقصى ${COUNT} يمكنك انشاء\n\n تنويه : فقط اربط الحسابات التي تملكها، إذا ربطت حسابك مع الأصدقاء،\n\n .لن يمكنكما اللعب معًا في نفس الوقت",
     "linkAccountsInstructionsText": "لربط حسابين, انتج كود على احد الحسابين \nو ادخل  هذا الكود على الاخر.\nالتقدم و المخزون سيشتركا.\nيمكنك ربط حتى ${COUNT} حسابات.\n\nكن حذراً; هذا لا يمكن استرجاعه",
-    "linkAccountsText": "ربط حساب",
+    "linkAccountsText": "ربط الحسابات",
     "linkedAccountsText": ": حساباتي المرتبطة",
     "manageAccountText": "إدارة الحساب",
     "nameChangeConfirm": "هل تريد تغيير اسم حسابك إلى ${NAME}؟",
@@ -33,7 +33,7 @@
     "signInWithTestAccountText": "تسجيل الدخول بحساب تجريبي",
     "signInWithText": "تسجيل دخول مع ${SERVICE}",
     "signInWithV2InfoText": "حساب يعمل على جميع المنصات",
-    "signInWithV2Text": "قم بتسجيل الدخول باستخدام حساب BombSquad",
+    "signInWithV2Text": "قم بتسجيل الدخول باستخدام حساب فرقة القنبلة",
     "signOutText": "تسجيل الخروج",
     "signingInText": "...جارٍ تسجيل دخولك",
     "signingOutText": "...جارٍ تسجيل خروجك",
@@ -79,7 +79,7 @@
     "Free Loader": {
       "descriptionFull": "ابدأ بلعب الوضع الحر للجميع مع لاعبين أو أكثر",
       "descriptionFullComplete": "تم بدء لعبة بوضع الحرية للجميع مع لاعِبَيْنْ أو أكثر",
-      "name": "الفريق المجاني"
+      "name": "محمل مجاني"
     },
     "Gold Miner": {
       "description": "اقتل 6 خصوم بأستخدام الألغام الأرضيَّة",
@@ -196,7 +196,7 @@
       "descriptionComplete": "لقد هزمْتَ كل الموجات",
       "descriptionFull": "${LEVEL} اهزم كل الموجات في",
       "descriptionFullComplete": "${LEVEL} لقد هزمتَ كل الموجات في",
-      "name": "${LEVEL} نصر"
+      "name": "${LEVEL} إنتصار"
     },
     "Pro Runaround Victory": {
       "description": "اكمل كل الموجات",
@@ -351,7 +351,7 @@
     "soundtrackDescriptionText": "(اختر موسيقاك الخاصة لتعمل خلال اللعب)",
     "titleText": "الصوت"
   },
-  "autoText": "ذاتي الاختيار",
+  "autoText": "تلقائيا",
   "backText": "للخلف",
   "banThisPlayerText": "حظر هاذا الاعب",
   "bestOfFinalText": "الافضل في ${COUNT}",
@@ -601,6 +601,7 @@
     "localProfileText": "(الملف الشخصي المحلي)",
     "nameDescriptionText": "اسم اللاعب",
     "nameText": "الاسم",
+    "profileAlreadyExistsText": ".يوجد ملف شخصي بهذا الإسم بالفِعل",
     "randomText": "عشوائي",
     "titleEditText": "تعديل الملف الشخصي",
     "titleNewText": "ملف شخصي جديد",
@@ -612,7 +613,7 @@
     "cantDeleteDefaultText": "لا يمكنك حذف الصوت الافتراضي.",
     "cantEditDefaultText": "لا يمكن التعديل على تسجيل الصوت الاساسي. قم  بنسخه او أنشئ  واحدا جديدا",
     "cantOverwriteDefaultText": "لا يمكن الكتابة فوق الصوت الافتراضي",
-    "cantSaveAlreadyExistsText": "يوجد مقطع صوتي بهذا الاسم من قبل.",
+    "cantSaveAlreadyExistsText": "يوجد مقطع صوتي بهذا الاسم.",
     "defaultGameMusicText": "<موسيقى اللعبة الافتراضية>",
     "defaultSoundtrackNameText": "الصوت الافتراضي",
     "deleteConfirmText": "حذف الموسيقى التصويرية:\n\n'${NAME}'؟",
@@ -682,6 +683,8 @@
     "duplicateText": "مكرر\nقائمة التشغيل",
     "editText": "تصحيح\nقائمة التشغيل",
     "newText": "الجديد\nقائمة التشغيل",
+    "pointsToWinText": "نقاط للفوز",
+    "seriesLengthText": "طول السلسلة",
     "showTutorialText": "عرض البرنامج التعليمي",
     "shuffleGameOrderText": "ترتيب لعبة المراوغة",
     "titleText": "تخصيص ${TYPE} قوائم تشغيل"
@@ -789,7 +792,7 @@
     "titleText": "متعدد الاعبين",
     "wifiDirectDescriptionBottomText": "إذا كانت جميع الأجهزة تحتوي على لوحة \"واي-في مباشر\"، فيجب أن تكون قادرة على استخدامها للعثور عليها\nوالتواصل مع بعضها البعض. مرة واحدة يتم توصيل جميع الأجهزة، يمكنك تشكيل الأطراف\nهنا باستخدام علامة التبويب \"الشبكة المحلية\"، تماما كما هو الحال مع شبكة واي فاي العادية.\n\nللحصول على أفضل النتائج، يجب أن يكون مضيف واي-في ديريكت أيضا مضيف الطرف ${APP_NAME}.",
     "wifiDirectDescriptionTopText": "واي فاي المباشر يمكن استخدامها لتوصيل أجهزة الروبوت مباشرة دون\nوالتي تحتاج إلى شبكة واي فاي. هذا يعمل بشكل أفضل على الروبوت 4.2 أو أحدث.\n\nلاستخدامه، افتح إعدادات واي-في وابحث عن \"واي-في ديريكت\" في القائمة.",
-    "wifiDirectOpenWiFiSettingsText": "افتح إعدادات واي-في",
+    "wifiDirectOpenWiFiSettingsText": "افتح إعدادات واي-فاي",
     "wifiDirectText": "واي فاي مباشر",
     "worksBetweenAllPlatformsText": "(يعمل بين جميع المنصات)",
     "worksWithGooglePlayDevicesText": "(يعمل مع الأجهزة التي تعمل على جوجل بلاي (أندرويد) نسخة من اللعبة)",
@@ -1277,10 +1280,12 @@
     "kidFriendlyModeText": "وضع الأطفال (يقلل العنف، إلخ)",
     "languageText": "لغة",
     "moddingGuideText": "دليل التعديلات البرمجية",
+    "moddingToolsText": "أدوات التعديلات البرمجية",
     "mustRestartText": ".يجب أن تقوم بإعادة تشغيل اللعبة لكي يعمل هذا",
     "netTestingText": "اختبار الشبكة",
     "resetText": "إعادة تعيين",
     "showBombTrajectoriesText": "عرض مسارات القنبلة",
+    "showDemosWhenIdleText": "عرض العروض التوضيحية عند الخمول",
     "showDevConsoleButtonText": "إظهار زر وحدة تحكم المطورين",
     "showInGamePingText": "عرض التأخير الداخلي للعبة",
     "showPlayerNamesText": "إظهار اسماء اللاعبين",
@@ -1301,6 +1306,9 @@
   "signInWithGameCenterText": "لاستخدام حساب مركز الألعاب،\nسجل الدخول باستخدام تطبيق مركز الألعاب.",
   "singleGamePlaylistNameText": "فقط ${GAME}",
   "singlePlayerCountText": "1 لاعب",
+  "sizeLargeText": "كبير",
+  "sizeMediumText": "وسط",
+  "sizeSmallText": "صغير",
   "soloNameFilterText": "منفردا ${NAME}",
   "soundtrackTypeNames": {
     "CharSelect": "اختر شخصية",
@@ -1823,6 +1831,7 @@
     "toSkipPressAnythingText": "(إلمس او إضغظ اي شئ لتخطي البرنامج التعليمي)"
   },
   "twoKillText": "!قتل مزدوج",
+  "uiScaleText": "مقياس واجهة المستخدم",
   "unavailableText": "غير متوفر",
   "unconfiguredControllerDetectedText": ":تم الكشف على يد تحكم غير مهيئة",
   "unlockThisInTheStoreText": "هذا يجب ان يفتح في المتجر",
@@ -1836,6 +1845,8 @@
   "upgradeText": "احصل على ترقية",
   "upgradeToPlayText": "في متجر اللعبة لتلعب هذا \"${PRO}\" اشتري",
   "useDefaultText": "استخدام الإفتراضي",
+  "userSystemScriptsCreateText": "إنشاء البرامج النصية لنظام المستخدم",
+  "userSystemScriptsDeleteText": "حذف البرامج النصية لنظام المستخدم",
   "usesExternalControllerText": "هذه اللعبة تستخدم يد تحكم خارجية للإدخال",
   "usingItunesText": "...استخدام تطبيق الموسيقى للموسيقى التصويرية",
   "v2AccountLinkingInfoText": "اذا اردت ربط حسابات V2، قم بالتوجه الى 'ادارة الحساب'.",

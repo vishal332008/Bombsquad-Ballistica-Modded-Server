@@ -38,9 +38,7 @@ class AccountLinkWindow(bui.Window):
         base_scale = (
             1.65
             if uiscale is bui.UIScale.SMALL
-            else 1.5
-            if uiscale is bui.UIScale.MEDIUM
-            else 1.1
+            else 1.5 if uiscale is bui.UIScale.MEDIUM else 1.1
         )
         super().__init__(
             root_widget=bui.containerwidget(
@@ -48,9 +46,9 @@ class AccountLinkWindow(bui.Window):
                 transition=transition,
                 scale=base_scale,
                 scale_origin_stack_offset=scale_origin,
-                stack_offset=(0, -10)
-                if uiscale is bui.UIScale.SMALL
-                else (0, 0),
+                stack_offset=(
+                    (0, -10) if uiscale is bui.UIScale.SMALL else (0, 0)
+                ),
             )
         )
         self._cancel_button = bui.buttonwidget(
@@ -128,10 +126,12 @@ class AccountLinkWindow(bui.Window):
         plus.run_v1_account_transactions()
 
     def _enter_code_press(self) -> None:
-        from bauiv1lib import promocode
+        from bauiv1lib.sendinfo import SendInfoWindow
 
-        promocode.PromoCodeWindow(
-            modal=True, origin_widget=self._enter_code_button
+        SendInfoWindow(
+            modal=True,
+            legacy_code_mode=True,
+            origin_widget=self._enter_code_button,
         )
         bui.containerwidget(
             edit=self._root_widget, transition=self._transition_out
@@ -159,9 +159,7 @@ class AccountLinkCodeWindow(bui.Window):
                 scale=(
                     1.8
                     if uiscale is bui.UIScale.SMALL
-                    else 1.35
-                    if uiscale is bui.UIScale.MEDIUM
-                    else 1.0
+                    else 1.35 if uiscale is bui.UIScale.MEDIUM else 1.0
                 ),
             )
         )

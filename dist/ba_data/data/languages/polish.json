@@ -1,6 +1,6 @@
 {
   "accountSettingsWindow": {
-    "accountNameRules": "Nazwy kont nie mogą zawierać emotikonów ani innych znaków specjalnych",
+    "accountNameRules": "Nazwy kont nie mogą zawierać emotikonów, ani innych znaków specjalnych",
     "accountProfileText": "(profil konta)",
     "accountsText": "Konta",
     "achievementProgressText": "Osiągnięcia: ${COUNT} z ${TOTAL}",
@@ -46,7 +46,7 @@
     "unlinkAccountsInstructionsText": "Wybierz konto do rozłączenia",
     "unlinkAccountsText": "Rozłącz konta",
     "unlinkLegacyV1AccountsText": "Rozłącz stare konta (V1)",
-    "v2LinkInstructionsText": "Użyj tego linku, aby stworzyć konto lub zaloguj się.",
+    "v2LinkInstructionsText": "Użyj tego linku, aby stworzyć konto lub zalogować się.",
     "viaAccount": "(przez konto ${NAME})",
     "youAreLoggedInAsText": "Jesteś zalogowany jako:",
     "youAreSignedInAsText": "Jesteś zalogowany jako:"
@@ -74,15 +74,15 @@
       "name": "Podwójne dzierżenie"
     },
     "Flawless Victory": {
-      "description": "Wygraj nie dając się uderzyć",
-      "descriptionComplete": "Wygrałeś nie dając się uderzyć",
-      "descriptionFull": "Wygraj w trybie ${LEVEL} nie dając się uderzyć",
-      "descriptionFullComplete": "Wygrałeś w trybie ${LEVEL} nie dając się uderzyć",
+      "description": "Wygraj, nie dając się uderzyć",
+      "descriptionComplete": "Wygrałeś, nie dając się uderzyć",
+      "descriptionFull": "Wygraj w trybie ${LEVEL}, nie dając się uderzyć",
+      "descriptionFullComplete": "Wygrałeś w trybie ${LEVEL}, nie dając się uderzyć",
       "name": "Zwycięstwo bez skazy"
     },
     "Free Loader": {
       "descriptionFull": "Zacznij grę Free-For-All z dwoma graczami lub więcej",
-      "descriptionFullComplete": "Zaczęto grę Free-For-All z dwoma, lub większą ilością graczy",
+      "descriptionFullComplete": "Zaczęto grę Free-For-All z dwoma lub większą ilością graczy",
       "name": "Łącznik graczy"
     },
     "Gold Miner": {
@@ -182,10 +182,10 @@
       "name": "Zawodowy Bokser"
     },
     "Pro Football Shutout": {
-      "description": "Wygraj nie pozwalając zapunktować złym gościom",
-      "descriptionComplete": "Wygrałeś nie pozwalając zapunktować złym gościom",
-      "descriptionFull": "Wygraj w trybie ${LEVEL} nie pozwalając zapunktować złym gościom",
-      "descriptionFullComplete": "Wygrałeś w trybie ${LEVEL} nie pozwalając zapunktować złym gościom",
+      "description": "Wygraj, nie pozwalając zapunktować złym gościom",
+      "descriptionComplete": "Wygrałeś, nie pozwalając zapunktować złym gościom",
+      "descriptionFull": "Wygraj w trybie ${LEVEL}, nie pozwalając zapunktować złym gościom",
+      "descriptionFullComplete": "Wygrałeś w trybie ${LEVEL}, nie pozwalając zapunktować złym gościom",
       "name": "Zamurowanie bramki w trybie ${LEVEL}"
     },
     "Pro Football Victory": {
@@ -304,10 +304,10 @@
       "name": "Ściana"
     },
     "Uber Football Shutout": {
-      "description": "Wygraj nie pozwalając zapunktować wrogom",
-      "descriptionComplete": "Wygrałeś nie pozwalając zapunktować wrogom",
-      "descriptionFull": "Wygraj w trybie ${LEVEL} nie pozwalając zapunktować wrogom",
-      "descriptionFullComplete": "Wygrałeś w trybie ${LEVEL} nie pozwalając zapunktować wrogom",
+      "description": "Wygraj, nie pozwalając zapunktować wrogom",
+      "descriptionComplete": "Wygrałeś, nie pozwalając zapunktować wrogom",
+      "descriptionFull": "Wygraj w trybie ${LEVEL}, nie pozwalając zapunktować wrogom",
+      "descriptionFullComplete": "Wygrałeś w trybie ${LEVEL}, nie pozwalając zapunktować wrogom",
       "name": "Zamurowanie bramki w trybie ${LEVEL}"
     },
     "Uber Football Victory": {
@@ -573,6 +573,7 @@
   "demoText": "Demo",
   "denyText": "Odmów",
   "deprecatedText": "Przestarzałe",
+  "descriptionText": "Opis",
   "desktopResText": "Rozdzielczość ekranu",
   "deviceAccountUpgradeText": "Uwaga:\nLogujesz się kontem urządzenia (${NAME}).\nKonta urządzenia zostaną usunięte w przyszłej aktualizacji.\nUlepsz do konta V2, jeżeli chcesz zachować swój postęp.",
   "difficultyEasyText": "Łatwy",
@@ -620,6 +621,7 @@
     "localProfileText": "(lokalny profil)",
     "nameDescriptionText": "Nazwa gracza",
     "nameText": "Nazwa",
+    "profileAlreadyExistsText": "Profil z taką nazwą już istnieje.",
     "randomText": "losuj",
     "titleEditText": "Edytuj profil",
     "titleNewText": "Nowy profil",
@@ -706,6 +708,8 @@
     "editText": "Edytuj\nlistę",
     "gameListText": "Lista rozgrywek",
     "newText": "Nowa\nlista",
+    "pointsToWinText": "Punkty do zwycięstwa",
+    "seriesLengthText": "Długość serii",
     "showTutorialText": "Pokaż samouczek po grze",
     "shuffleGameOrderText": "Losowa kolejność rozgrywek",
     "titleText": "Własne listy rozgrywek trybu ${TYPE}"
@@ -747,10 +751,10 @@
     "friendPromoCodeAwardText": "Dostaniesz ${COUNT} kuponów zawsze gdy tego użyjesz.",
     "friendPromoCodeExpireText": "Ten kod wygaśnie po ${EXPIRE_HOURS} godzinach i działa tylko dla nowych graczy.",
     "friendPromoCodeInfoText": "Może zostać wykupione do ${COUNT} kuponów.\n\nIdź do \"Ustawienia->Zaawansowane->Wpisz Kod Promocyjny\" w grze aby go użyć. Idź do bombsquadgame.com by pobrać\nlinki do wszystkich wspieranych platform. Ten kod\nwygaśnie w ${EXPIRE_HOURS} godzin i jest prawidłowy tylko dla nowych graczy.",
-    "friendPromoCodeInstructionsText": "Aby użyć, otwórz ${APP_NAME} i idź do \"Ustawienia->Zaawansowane-> Wpisz kod\".\nWejdź na bombsquadgame.com by zobaczyć linki dla wszystkich dostępnych platform (Android itp.)",
+    "friendPromoCodeInstructionsText": "Aby go użyć, otwórz ${APP_NAME} i przejdź do \"Ustawienia->Zaawansowane->Wyślij informacje\".\nLinki do pobrania gry dla wszystkich obsługiwanych platform znajdziesz na stronie bombsquadgame.com.",
     "friendPromoCodeRedeemLongText": "Wykorzystanie go daje ${COUNT} darmowych kuponów dla najwięcej ${MAX_USES} ludzi.",
     "friendPromoCodeRedeemShortText": "Może być żądane do ${COUNT} kuponów w grze.",
-    "friendPromoCodeWhereToEnterText": "(W \"Ustawienia->Zaawansowane->Wpisz kod\")",
+    "friendPromoCodeWhereToEnterText": "(w \"Ustawienia->Zaawansowane->Wyślij informacje\")",
     "getFriendInviteCodeText": "Zdobądź kod promocyjny kumpla",
     "googlePlayDescriptionText": "Zaproś użytkowników Google Play na imprezę:",
     "googlePlayInviteText": "Zaproś",
@@ -1307,6 +1311,7 @@
   },
   "scoreWasText": "(było ${COUNT})",
   "selectText": "Wybierz",
+  "sendInfoDescriptionText": "Przesyła stan konta i aplikacji do dewelopera.\nProszę o podanie imienia lub powodu wysłania.",
   "seriesWinLine1PlayerText": "WYGRAŁ",
   "seriesWinLine1TeamText": "WYGRALI",
   "seriesWinLine1Text": "WYGRAŁ",
@@ -1325,7 +1330,8 @@
     "alwaysUseInternalKeyboardDescriptionText": "(prosta klawiatura na ekranie do edycji tekstu - przyjazna kontrolerom)",
     "alwaysUseInternalKeyboardText": "Zawsze używaj wewn. klawiatury",
     "benchmarksText": "Benchmarki & Testy Wydajności",
-    "disableCameraGyroscopeMotionText": "Wyłącz Kontrolę Kamery Żyroskopem",
+    "devToolsText": "Narzędzia deweloperskie",
+    "disableCameraGyroscopeMotionText": "Wyłącz kontrolę kamery żyroskopem",
     "disableCameraShakeText": "Wyłącz trzęsienie kamery",
     "disableThisNotice": "(możesz wyłączyć to powiadomienie w ustawieniach zaawansowanych)",
     "enablePackageModsDescriptionText": "(aktywuje dodatkowe możliwości modowania ale wyłącza grę sieciową)",
@@ -1337,10 +1343,14 @@
     "kidFriendlyModeText": "Tryb dla dzieciaków (zredukowana przemoc itd.)",
     "languageText": "Język",
     "moddingGuideText": "Przewodnik modowania gry",
+    "moddingToolsText": "Narzędzia do modyfikacji",
     "mustRestartText": "Musisz uruchomić ponownie grę aby zastosować zmiany.",
     "netTestingText": "Testowanie sieci",
     "resetText": "Reset",
+    "sendInfoText": "Wyślij Info",
     "showBombTrajectoriesText": "Pokaż trajektorię bomb",
+    "showDemosWhenIdleText": "Pokazuj wersje demonstracyjne w stanie bezczynności",
+    "showDeprecatedLoginTypesText": "Pokaż przestarzałe typy logowania",
     "showDevConsoleButtonText": "Pokaż przycisk konsoli deweloperskiej",
     "showInGamePingText": "Pokaż ping w grze",
     "showPlayerNamesText": "Pokazuj nazwy graczy",
@@ -1351,7 +1361,7 @@
     "translationFetchingStatusText": "sprawdzanie statusu tłumaczenia...",
     "translationInformMe": "Powiadom mnie, gdy mój język będzie potrzebował uaktualnienia",
     "translationNoUpdateNeededText": "Obecnie używany język jest aktualny; ekstra!",
-    "translationUpdateNeededText": "** obecnie używany język wymaga jego zaktualizowania! **",
+    "translationUpdateNeededText": "** Obecnie używany język wymaga jego zaktualizowania! **",
     "vrTestingText": "Testowanie VR"
   },
   "shareText": "Udostępnij",
@@ -1361,6 +1371,9 @@
   "signInWithGameCenterText": "By użyć konta Game Center\nzapisz się aplikacją Game Center.",
   "singleGamePlaylistNameText": "Tylko ${GAME}",
   "singlePlayerCountText": "1 gracz",
+  "sizeLargeText": "Duży",
+  "sizeMediumText": "Średni",
+  "sizeSmallText": "Mały",
   "soloNameFilterText": "Solówka ${NAME}",
   "soundtrackTypeNames": {
     "CharSelect": "Wybór postaci",
@@ -1914,6 +1927,7 @@
     "toSkipPressAnythingText": "(stuknij lub naciśnij cokolwiek, aby pominąć samouczek)"
   },
   "twoKillText": "PODWÓJNE ZABÓJSTWO!",
+  "uiScaleText": "Skala interfejsu",
   "unavailableText": "niedostępne",
   "unconfiguredControllerDetectedText": "Wykryto nieskonfigurowany kontroler:",
   "unlockThisInTheStoreText": "To musi zostać odblokowane w sklepie.",
@@ -1927,6 +1941,8 @@
   "upgradeText": "Ulepsz",
   "upgradeToPlayText": "Aby zagrać, odblokuj grę w wersji \"${PRO}\".",
   "useDefaultText": "Użyj domyślnych",
+  "userSystemScriptsCreateText": "Utwórz skrypty systemowe użytkownika",
+  "userSystemScriptsDeleteText": "Usuń skrypty systemowe użytkownika",
   "usesExternalControllerText": "Ta gra wykorzystuje zewnętrzny kontroler jako wejście.",
   "usingItunesText": "Korzystanie z aplikacji muzycznej jako ścieżki dźwiękowej...",
   "usingItunesTurnRepeatAndShuffleOnText": "Upewnij się, że w ustawieniach iTunes tasowanie utworów i powtarzanie całości jest włączone.",
@@ -1944,7 +1960,7 @@
   "waitingForLocalPlayersText": "Oczekiwanie na lokalnych graczy...",
   "waitingForPlayersText": "oczekiwanie na dołączenie graczy...",
   "waitingInLineText": "Czekanie w kolejce (impreza pełna)...",
-  "watchAVideoText": "Zobacz Filmik",
+  "watchAVideoText": "Obejrzyj filmik",
   "watchAnAdText": "Obejrzyj reklamę",
   "watchWindow": {
     "deleteConfirmText": "Usunąć \"${REPLAY}\"?",

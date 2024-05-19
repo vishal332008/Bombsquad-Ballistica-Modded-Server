@@ -24,13 +24,11 @@ class RemoteAppSettingsWindow(bui.Window):
                 scale=(
                     1.85
                     if uiscale is bui.UIScale.SMALL
-                    else 1.3
-                    if uiscale is bui.UIScale.MEDIUM
-                    else 1.0
+                    else 1.3 if uiscale is bui.UIScale.MEDIUM else 1.0
                 ),
-                stack_offset=(-10, 0)
-                if uiscale is bui.UIScale.SMALL
-                else (0, 0),
+                stack_offset=(
+                    (-10, 0) if uiscale is bui.UIScale.SMALL else (0, 0)
+                ),
             )
         )
         btn = bui.buttonwidget(
@@ -86,9 +84,6 @@ class RemoteAppSettingsWindow(bui.Window):
             v_align='center',
         )
         v -= 90
-
-        # hmm the itms:// version doesnt bounce through safari but is kinda
-        # apple-specific-ish
 
         # Update: now we just show link to the remote webpage.
         bui.textwidget(

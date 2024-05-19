@@ -43,9 +43,7 @@ class SoundtrackBrowserWindow(bui.Window):
         self._height = (
             340
             if uiscale is bui.UIScale.SMALL
-            else 370
-            if uiscale is bui.UIScale.MEDIUM
-            else 440
+            else 370 if uiscale is bui.UIScale.MEDIUM else 440
         )
         spacing = 40.0
         v = self._height - 40.0
@@ -60,13 +58,11 @@ class SoundtrackBrowserWindow(bui.Window):
                 scale=(
                     2.3
                     if uiscale is bui.UIScale.SMALL
-                    else 1.6
-                    if uiscale is bui.UIScale.MEDIUM
-                    else 1.0
+                    else 1.6 if uiscale is bui.UIScale.MEDIUM else 1.0
                 ),
-                stack_offset=(0, -18)
-                if uiscale is bui.UIScale.SMALL
-                else (0, 0),
+                stack_offset=(
+                    (0, -18) if uiscale is bui.UIScale.SMALL else (0, 0)
+                ),
             )
         )
 
@@ -110,9 +106,7 @@ class SoundtrackBrowserWindow(bui.Window):
         scl = (
             1.0
             if uiscale is bui.UIScale.SMALL
-            else 1.13
-            if uiscale is bui.UIScale.MEDIUM
-            else 1.4
+            else 1.13 if uiscale is bui.UIScale.MEDIUM else 1.4
         )
         v -= 60.0 * scl
         self._new_button = btn = bui.buttonwidget(
@@ -245,9 +239,11 @@ class SoundtrackBrowserWindow(bui.Window):
         bui.widget(
             edit=self._scrollwidget,
             left_widget=self._new_button,
-            right_widget=bui.get_special_widget('party_button')
-            if bui.app.ui_v1.use_toolbars
-            else self._scrollwidget,
+            right_widget=(
+                bui.get_special_widget('party_button')
+                if bui.app.ui_v1.use_toolbars
+                else self._scrollwidget
+            ),
         )
         self._col = bui.columnwidget(parent=scrollwidget, border=2, margin=0)
 
@@ -286,8 +282,9 @@ class SoundtrackBrowserWindow(bui.Window):
         bui.getsound('shieldDown').play()
         assert self._selected_soundtrack_index is not None
         assert self._soundtracks is not None
-        if self._selected_soundtrack_index >= len(self._soundtracks):
-            self._selected_soundtrack_index = len(self._soundtracks)
+        self._selected_soundtrack_index = min(
+            self._selected_soundtrack_index, len(self._soundtracks)
+        )
         self._refresh()
 
     def _delete_soundtrack(self) -> None:
@@ -392,7 +389,7 @@ class SoundtrackBrowserWindow(bui.Window):
 
     def _back(self) -> None:
         # pylint: disable=cyclic-import
-        from bauiv1lib.settings import audio
+        from bauiv1lib.settings.audio import AudioSettingsWindow
 
         # no-op if our underlying widget is dead or on its way out.
         if not self._root_widget or self._root_widget.transitioning_out:
@@ -404,7 +401,7 @@ class SoundtrackBrowserWindow(bui.Window):
         )
         assert bui.app.classic is not None
         bui.app.ui_v1.set_main_menu_window(
-            audio.AudioSettingsWindow(transition='in_left').get_root_widget(),
+            AudioSettingsWindow(transition='in_left').get_root_widget(),
             from_window=self._root_widget,
         )
 
@@ -552,7 +549,10 @@ class SoundtrackBrowserWindow(bui.Window):
             return
         self._save_state()
         bui.containerwidget(edit=self._root_widget, transition='out_left')
-        SoundtrackEditWindow(existing_soundtrack=None)
+        bui.app.ui_v1.set_main_menu_window(
+            SoundtrackEditWindow(existing_soundtrack=None).get_root_widget(),
+            from_window=self._root_widget,
+        )
 
     def _create_done(self, new_soundtrack: str) -> None:
         if new_soundtrack is not None:

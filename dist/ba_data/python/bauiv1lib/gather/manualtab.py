@@ -9,10 +9,9 @@ import logging
 from enum import Enum
 from threading import Thread
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, cast, override
 from bauiv1lib.gather import GatherTab
 
-from typing_extensions import override
 import bauiv1 as bui
 import bascenev1 as bs
 
@@ -48,7 +47,10 @@ class _HostLookupThread(Thread):
         try:
             import socket
 
-            result = socket.gethostbyname(self._name)
+            result = [
+                item[-1][0]
+                for item in socket.getaddrinfo(self.name, self._port)
+            ][0]
         except Exception:
             result = None
         bui.pushcall(
@@ -212,15 +214,19 @@ class ManualGatherTab(GatherTab):
         inactive_color = (0.5, 0.4, 0.5)
         bui.textwidget(
             edit=self._join_by_address_text,
-            color=active_color
-            if value is SubTabType.JOIN_BY_ADDRESS
-            else inactive_color,
+            color=(
+                active_color
+                if value is SubTabType.JOIN_BY_ADDRESS
+                else inactive_color
+            ),
         )
         bui.textwidget(
             edit=self._favorites_text,
-            color=active_color
-            if value is SubTabType.FAVORITES
-            else inactive_color,
+            color=(
+                active_color
+                if value is SubTabType.FAVORITES
+                else inactive_color
+            ),
         )
 
         # Clear anything existing in the old sub-tab.
@@ -354,9 +360,7 @@ class ManualGatherTab(GatherTab):
         self._height = (
             578
             if uiscale is bui.UIScale.SMALL
-            else 670
-            if uiscale is bui.UIScale.MEDIUM
-            else 800
+            else 670 if uiscale is bui.UIScale.MEDIUM else 800
         )
 
         self._scroll_width = self._width - 130 + 2 * x_inset
@@ -375,16 +379,12 @@ class ManualGatherTab(GatherTab):
         b_height = (
             107
             if uiscale is bui.UIScale.SMALL
-            else 142
-            if uiscale is bui.UIScale.MEDIUM
-            else 190
+            else 142 if uiscale is bui.UIScale.MEDIUM else 190
         )
         b_space_extra = (
             0
             if uiscale is bui.UIScale.SMALL
-            else -2
-            if uiscale is bui.UIScale.MEDIUM
-            else -5
+            else -2 if uiscale is bui.UIScale.MEDIUM else -5
         )
 
         btnv = (
@@ -392,9 +392,7 @@ class ManualGatherTab(GatherTab):
             - (
                 48
                 if uiscale is bui.UIScale.SMALL
-                else 45
-                if uiscale is bui.UIScale.MEDIUM
-                else 40
+                else 45 if uiscale is bui.UIScale.MEDIUM else 40
             )
             - b_height
         )
@@ -513,9 +511,7 @@ class ManualGatherTab(GatherTab):
             scale=(
                 1.8
                 if uiscale is bui.UIScale.SMALL
-                else 1.55
-                if uiscale is bui.UIScale.MEDIUM
-                else 1.0
+                else 1.55 if uiscale is bui.UIScale.MEDIUM else 1.0
             ),
             size=(c_width, c_height),
             transition='in_scale',
@@ -1059,7 +1055,7 @@ class ManualGatherTab(GatherTab):
             self._t_accessible_extra = t_accessible_extra
             bui.app.classic.master_server_v1_get(
                 'bsAccessCheck',
-                {'b': bui.app.env.build_number},
+                {'b': bui.app.env.engine_build_number},
                 callback=bui.WeakCall(self._on_accessible_response),
             )
 

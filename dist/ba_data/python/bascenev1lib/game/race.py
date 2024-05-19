@@ -9,10 +9,9 @@ from __future__ import annotations
 
 import random
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 from dataclasses import dataclass
 
-from typing_extensions import override
 import bascenev1 as bs
 
 from bascenev1lib.actor.bomb import Bomb
@@ -778,9 +777,11 @@ class RaceGame(bs.TeamGameActivity[Player, Team]):
         assert self._timer is not None
         if self._timer.has_started():
             self._timer.stop(
-                endtime=None
-                if self._last_team_time is None
-                else (self._timer.getstarttime() + self._last_team_time)
+                endtime=(
+                    None
+                    if self._last_team_time is None
+                    else (self._timer.getstarttime() + self._last_team_time)
+                )
             )
 
         results = bs.GameResults()

@@ -52,9 +52,7 @@ class AdvancedSettingsWindow(bui.Window):
         self._height = (
             390.0
             if uiscale is bui.UIScale.SMALL
-            else 450.0
-            if uiscale is bui.UIScale.MEDIUM
-            else 520.0
+            else 450.0 if uiscale is bui.UIScale.MEDIUM else 520.0
         )
         self._lang_status_text: bui.Widget | None = None
 
@@ -71,13 +69,11 @@ class AdvancedSettingsWindow(bui.Window):
                 scale=(
                     2.06
                     if uiscale is bui.UIScale.SMALL
-                    else 1.4
-                    if uiscale is bui.UIScale.MEDIUM
-                    else 1.0
+                    else 1.4 if uiscale is bui.UIScale.MEDIUM else 1.0
                 ),
-                stack_offset=(0, -25)
-                if uiscale is bui.UIScale.SMALL
-                else (0, 0),
+                stack_offset=(
+                    (0, -25) if uiscale is bui.UIScale.SMALL else (0, 0)
+                ),
             )
         )
 
@@ -94,7 +90,7 @@ class AdvancedSettingsWindow(bui.Window):
         self._scroll_width = self._width - (100 + 2 * x_inset)
         self._scroll_height = self._height - 115.0
         self._sub_width = self._scroll_width * 0.95
-        self._sub_height = 808.0
+        self._sub_height = 870.0
 
         if self._show_always_use_internal_keyboard:
             self._sub_height += 62
@@ -112,6 +108,7 @@ class AdvancedSettingsWindow(bui.Window):
         if self._do_net_test_button:
             self._sub_height += self._extra_button_spacing
         self._sub_height += self._spacing * 2.0  # plugins
+        self._sub_height += self._spacing * 2.0  # dev tools
 
         self._r = 'settingsWindowAdvanced'
 
@@ -179,7 +176,7 @@ class AdvancedSettingsWindow(bui.Window):
         # Fetch the list of completed languages.
         bui.app.classic.master_server_v1_get(
             'bsLangGetCompleted',
-            {'b': app.env.build_number},
+            {'b': app.env.engine_build_number},
             callback=bui.WeakCall(self._completed_langs_cb),
         )
 
@@ -193,39 +190,48 @@ class AdvancedSettingsWindow(bui.Window):
         from bauiv1lib.settings import nettesting as _unused4
         from bauiv1lib import appinvite as _unused5
         from bauiv1lib import account as _unused6
-        from bauiv1lib import promocode as _unused7
+        from bauiv1lib import sendinfo as _unused7
         from bauiv1lib import debug as _unused8
         from bauiv1lib.settings import plugins as _unused9
+        from bauiv1lib.settings import devtools as _unused10
 
     def _update_lang_status(self) -> None:
         if self._complete_langs_list is not None:
             up_to_date = bui.app.lang.language in self._complete_langs_list
             bui.textwidget(
                 edit=self._lang_status_text,
-                text=''
-                if bui.app.lang.language == 'Test'
-                else bui.Lstr(
-                    resource=f'{self._r}.translationNoUpdateNeededText'
-                )
-                if up_to_date
-                else bui.Lstr(
-                    resource=f'{self._r}.translationUpdateNeededText'
+                text=(
+                    ''
+                    if bui.app.lang.language == 'Test'
+                    else (
+                        bui.Lstr(
+                            resource=f'{self._r}.translationNoUpdateNeededText'
+                        )
+                        if up_to_date
+                        else bui.Lstr(
+                            resource=f'{self._r}.translationUpdateNeededText'
+                        )
+                    )
                 ),
-                color=(0.2, 1.0, 0.2, 0.8)
-                if up_to_date
-                else (1.0, 0.2, 0.2, 0.8),
+                color=(
+                    (0.2, 1.0, 0.2, 0.8) if up_to_date else (1.0, 0.2, 0.2, 0.8)
+                ),
             )
         else:
             bui.textwidget(
                 edit=self._lang_status_text,
-                text=bui.Lstr(resource=f'{self._r}.translationFetchErrorText')
-                if self._complete_langs_error
-                else bui.Lstr(
-                    resource=f'{self._r}.translationFetchingStatusText'
+                text=(
+                    bui.Lstr(resource=f'{self._r}.translationFetchErrorText')
+                    if self._complete_langs_error
+                    else bui.Lstr(
+                        resource=f'{self._r}.translationFetchingStatusText'
+                    )
                 ),
-                color=(1.0, 0.5, 0.2)
-                if self._complete_langs_error
-                else (0.7, 0.7, 0.7),
+                color=(
+                    (1.0, 0.5, 0.2)
+                    if self._complete_langs_error
+                    else (0.7, 0.7, 0.7)
+                ),
             )
 
     def _rebuild(self) -> None:
@@ -282,33 +288,16 @@ class AdvancedSettingsWindow(bui.Window):
 
         this_button_width = 410
 
-        self._promo_code_button = bui.buttonwidget(
-            parent=self._subcontainer,
-            position=(self._sub_width / 2 - this_button_width / 2, v - 14),
-            size=(this_button_width, 60),
-            autoselect=True,
-            label=bui.Lstr(resource=f'{self._r}.enterPromoCodeText'),
-            text_scale=1.0,
-            on_activate_call=self._on_promo_code_press,
-        )
-        if self._back_button is not None:
-            bui.widget(
-                edit=self._promo_code_button,
-                up_widget=self._back_button,
-                left_widget=self._back_button,
-            )
-        v -= self._extra_button_spacing * 0.8
-
         assert bui.app.classic is not None
         bui.textwidget(
             parent=self._subcontainer,
-            position=(200, v + 10),
+            position=(70, v + 10),
             size=(0, 0),
             text=bui.Lstr(resource=f'{self._r}.languageText'),
             maxwidth=150,
-            scale=0.95,
+            scale=1.2,
             color=bui.app.ui_v1.title_color,
-            h_align='right',
+            h_align='left',
             v_align='center',
         )
 
@@ -387,7 +376,7 @@ class AdvancedSettingsWindow(bui.Window):
 
         bui.textwidget(
             parent=self._subcontainer,
-            position=(self._sub_width * 0.5, v + 10),
+            position=(90, v + 10),
             size=(0, 0),
             text=bui.Lstr(
                 resource=f'{self._r}.helpTranslateText',
@@ -398,7 +387,7 @@ class AdvancedSettingsWindow(bui.Window):
             flatness=1.0,
             scale=0.65,
             color=(0.4, 0.9, 0.4, 0.8),
-            h_align='center',
+            h_align='left',
             v_align='center',
         )
         v -= self._spacing * 1.9
@@ -429,7 +418,7 @@ class AdvancedSettingsWindow(bui.Window):
             maxwidth=400.0,
         )
         self._update_lang_status()
-        v -= 40
+        v -= 50
 
         lang_inform = plus.get_v1_account_misc_val('langInform', False)
 
@@ -477,25 +466,25 @@ class AdvancedSettingsWindow(bui.Window):
         )
 
         v -= 42
-        self._show_dev_console_button_check_box = ConfigCheckBox(
-            parent=self._subcontainer,
-            position=(50, v),
-            size=(self._sub_width - 100, 30),
-            configkey='Show Dev Console Button',
-            displayname=bui.Lstr(
-                resource=f'{self._r}.showDevConsoleButtonText'
-            ),
-            scale=1.0,
-            maxwidth=430,
-        )
-
-        v -= 42
         self._show_demos_when_idle_check_box = ConfigCheckBox(
             parent=self._subcontainer,
             position=(50, v),
             size=(self._sub_width - 100, 30),
             configkey='Show Demos When Idle',
             displayname=bui.Lstr(resource=f'{self._r}.showDemosWhenIdleText'),
+            scale=1.0,
+            maxwidth=430,
+        )
+
+        v -= 42
+        self._show_deprecated_login_types_check_box = ConfigCheckBox(
+            parent=self._subcontainer,
+            position=(50, v),
+            size=(self._sub_width - 100, 30),
+            configkey='Show Deprecated Login Types',
+            displayname=bui.Lstr(
+                resource=f'{self._r}.showDeprecatedLoginTypesText'
+            ),
             scale=1.0,
             maxwidth=430,
         )
@@ -575,6 +564,19 @@ class AdvancedSettingsWindow(bui.Window):
                 bui.open_url, 'https://ballistica.net/wiki/modding-guide'
             ),
         )
+
+        v -= self._spacing * 2.0
+
+        self._dev_tools_button = bui.buttonwidget(
+            parent=self._subcontainer,
+            position=(self._sub_width / 2 - this_button_width / 2, v - 10),
+            size=(this_button_width, 60),
+            autoselect=True,
+            label=bui.Lstr(resource=f'{self._r}.devToolsText'),
+            text_scale=1.0,
+            on_activate_call=self._on_dev_tools_button_press,
+        )
+
         if self._show_always_use_internal_keyboard:
             assert self._always_use_internal_keyboard_check_box is not None
             bui.widget(
@@ -668,6 +670,17 @@ class AdvancedSettingsWindow(bui.Window):
             on_activate_call=self._on_benchmark_press,
         )
 
+        v -= 100
+        self._send_info_button = bui.buttonwidget(
+            parent=self._subcontainer,
+            position=(self._sub_width / 2 - this_button_width / 2, v - 14),
+            size=(this_button_width, 60),
+            autoselect=True,
+            label=bui.Lstr(resource=f'{self._r}.sendInfoText'),
+            text_scale=1.0,
+            on_activate_call=self._on_send_info_press,
+        )
+
         for child in self._subcontainer.get_children():
             bui.widget(edit=child, show_buffer_bottom=30, show_buffer_top=20)
 
@@ -720,14 +733,6 @@ class AdvancedSettingsWindow(bui.Window):
         if not self._root_widget or self._root_widget.transitioning_out:
             return
 
-        # Net-testing requires a signed in v1 account.
-        if plus.get_v1_account_state() != 'signed_in':
-            bui.screenmessage(
-                bui.Lstr(resource='notSignedInErrorText'), color=(1, 0, 0)
-            )
-            bui.getsound('error').play()
-            return
-
         self._save_state()
         bui.containerwidget(edit=self._root_widget, transition='out_left')
         assert bui.app.classic is not None
@@ -763,9 +768,26 @@ class AdvancedSettingsWindow(bui.Window):
             from_window=self._root_widget,
         )
 
-    def _on_promo_code_press(self) -> None:
-        from bauiv1lib.promocode import PromoCodeWindow
-        from bauiv1lib.account import show_sign_in_prompt
+    def _on_dev_tools_button_press(self) -> None:
+        # pylint: disable=cyclic-import
+        from bauiv1lib.settings.devtools import DevToolsWindow
+
+        # no-op if our underlying widget is dead or on its way out.
+        if not self._root_widget or self._root_widget.transitioning_out:
+            return
+
+        self._save_state()
+        bui.containerwidget(edit=self._root_widget, transition='out_left')
+        assert bui.app.classic is not None
+        bui.app.ui_v1.set_main_menu_window(
+            DevToolsWindow(
+                origin_widget=self._dev_tools_button
+            ).get_root_widget(),
+            from_window=self._root_widget,
+        )
+
+    def _on_send_info_press(self) -> None:
+        from bauiv1lib.sendinfo import SendInfoWindow
 
         # no-op if our underlying widget is dead or on its way out.
         if not self._root_widget or self._root_widget.transitioning_out:
@@ -774,17 +796,12 @@ class AdvancedSettingsWindow(bui.Window):
         plus = bui.app.plus
         assert plus is not None
 
-        # We have to be logged in for promo-codes to work.
-        if plus.get_v1_account_state() != 'signed_in':
-            show_sign_in_prompt()
-            return
-
         self._save_state()
         bui.containerwidget(edit=self._root_widget, transition='out_left')
         assert bui.app.classic is not None
         bui.app.ui_v1.set_main_menu_window(
-            PromoCodeWindow(
-                origin_widget=self._promo_code_button
+            SendInfoWindow(
+                origin_widget=self._send_info_button
             ).get_root_widget(),
             from_window=self._root_widget,
         )
@@ -806,6 +823,7 @@ class AdvancedSettingsWindow(bui.Window):
 
     def _save_state(self) -> None:
         # pylint: disable=too-many-branches
+        # pylint: disable=too-many-statements
         try:
             sel = self._root_widget.get_selected_child()
             if sel == self._scrollwidget:
@@ -814,14 +832,16 @@ class AdvancedSettingsWindow(bui.Window):
                     sel_name = 'VRTest'
                 elif sel == self._net_test_button:
                     sel_name = 'NetTest'
-                elif sel == self._promo_code_button:
-                    sel_name = 'PromoCode'
+                elif sel == self._send_info_button:
+                    sel_name = 'SendInfo'
                 elif sel == self._benchmarks_button:
                     sel_name = 'Benchmarks'
                 elif sel == self._kick_idle_players_check_box.widget:
                     sel_name = 'KickIdlePlayers'
                 elif sel == self._show_demos_when_idle_check_box.widget:
                     sel_name = 'ShowDemosWhenIdle'
+                elif sel == self._show_deprecated_login_types_check_box.widget:
+                    sel_name = 'ShowDeprecatedLoginTypes'
                 elif sel == self._show_game_ping_check_box.widget:
                     sel_name = 'ShowPing'
                 elif sel == self._disable_camera_shake_check_box.widget:
@@ -848,12 +868,12 @@ class AdvancedSettingsWindow(bui.Window):
                     sel_name = 'ShowUserMods'
                 elif sel == self._plugins_button:
                     sel_name = 'Plugins'
+                elif sel == self._dev_tools_button:
+                    sel_name = 'DevTools'
                 elif sel == self._modding_guide_button:
                     sel_name = 'ModdingGuide'
                 elif sel == self._language_inform_checkbox:
                     sel_name = 'LangInform'
-                elif sel == self._show_dev_console_button_check_box.widget:
-                    sel_name = 'ShowDevConsole'
                 else:
                     raise ValueError(f'unrecognized selection \'{sel}\'')
             elif sel == self._back_button:
@@ -883,14 +903,16 @@ class AdvancedSettingsWindow(bui.Window):
                     sel = self._vr_test_button
                 elif sel_name == 'NetTest':
                     sel = self._net_test_button
-                elif sel_name == 'PromoCode':
-                    sel = self._promo_code_button
+                elif sel_name == 'SendInfo':
+                    sel = self._send_info_button
                 elif sel_name == 'Benchmarks':
                     sel = self._benchmarks_button
                 elif sel_name == 'KickIdlePlayers':
                     sel = self._kick_idle_players_check_box.widget
                 elif sel_name == 'ShowDemosWhenIdle':
                     sel = self._show_demos_when_idle_check_box.widget
+                elif sel_name == 'ShowDeprecatedLoginTypes':
+                    sel = self._show_deprecated_login_types_check_box.widget
                 elif sel_name == 'ShowPing':
                     sel = self._show_game_ping_check_box.widget
                 elif sel_name == 'DisableCameraShake':
@@ -915,12 +937,12 @@ class AdvancedSettingsWindow(bui.Window):
                     sel = self._show_user_mods_button
                 elif sel_name == 'Plugins':
                     sel = self._plugins_button
+                elif sel_name == 'DevTools':
+                    sel = self._dev_tools_button
                 elif sel_name == 'ModdingGuide':
                     sel = self._modding_guide_button
                 elif sel_name == 'LangInform':
                     sel = self._language_inform_checkbox
-                elif sel_name == 'ShowDevConsole':
-                    sel = self._show_dev_console_button_check_box.widget
                 else:
                     sel = None
                 if sel is not None:

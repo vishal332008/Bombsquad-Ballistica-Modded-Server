@@ -6,9 +6,8 @@ from __future__ import annotations
 import copy
 import random
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
-from typing_extensions import override
 import babase
 
 import _bascenev1
@@ -67,8 +66,8 @@ class MultiTeamSession(Session):
             max_players=self.get_max_players(),
         )
 
-        self._series_length: int = classic.teams_series_length
-        self._ffa_series_length: int = classic.ffa_series_length
+        self._series_length: int = int(cfg.get('Teams Series Length', 7))
+        self._ffa_series_length: int = int(cfg.get('FFA Series Length', 24))
 
         show_tutorial = cfg.get('Show Tutorial', True)
 

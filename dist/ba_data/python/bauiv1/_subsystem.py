@@ -6,9 +6,8 @@ from __future__ import annotations
 
 import logging
 import inspect
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
-from typing_extensions import override
 import babase
 
 import _bauiv1
@@ -43,7 +42,10 @@ class UIV1Subsystem(babase.AppSubsystem):
 
         self._uiscale: babase.UIScale
 
-        interfacetype = env['ui_scale']
+        interfacetype = babase.app.config.get('UI Scale', env['ui_scale'])
+        if interfacetype == 'auto':
+            interfacetype = env['ui_scale']
+
         if interfacetype == 'large':
             self._uiscale = babase.UIScale.LARGE
         elif interfacetype == 'medium':

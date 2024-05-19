@@ -8,9 +8,8 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
-from typing_extensions import override
 import bascenev1 as bs
 
 from bascenev1lib.actor.spazfactory import SpazFactory
@@ -478,7 +477,7 @@ class EliminationGame(bs.TeamGameActivity[Player, Team]):
                     points.append(
                         ((start_pos - player_pos).length(), start_pos)
                     )
-                # Hmm.. we need to sorting vectors too?
+                # Hmm.. we need to sort vectors too?
                 points.sort(key=lambda x: x[0])
                 return points[-1][1]
         return None

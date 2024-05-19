@@ -3,7 +3,8 @@
 """Provides functionality for displaying QR codes."""
 from __future__ import annotations
 
-from typing_extensions import override
+from typing import override
+
 import bauiv1 as bui
 
 from bauiv1lib.popup import PopupWindow
@@ -19,9 +20,7 @@ class QRCodeWindow(PopupWindow):
         scale = (
             2.3
             if uiscale is bui.UIScale.SMALL
-            else 1.65
-            if uiscale is bui.UIScale.MEDIUM
-            else 1.23
+            else 1.65 if uiscale is bui.UIScale.MEDIUM else 1.23
         )
         self._transitioning_out = False
         self._width = 450

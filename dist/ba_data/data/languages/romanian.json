@@ -1878,7 +1878,7 @@
   "xbox360ControllersWindow": {
     "getDriverText": "Instalează Driver-ul.",
     "macInstructions2Text": "Pentru a folosi controllerele fără fir, vei avea nevoie de un receptor\ncare vine cu pachetul 'Xbox 360 Wireless Controller for Windows'.\nFiecare receptor te lasă să conectezi până la 4 controllere.\n\nImportant: Receptoare de tip 3rd-party nu vor funcționa cu acest driver;\nAsigură-te că pe receptor scrie 'Microsoft', nu 'XBOX 360'.\nMicrosoft nu mai le vinde separat, deci va trebui să iei unul\nîmpreună cu controllerul sau de pe un site, cum ar fi Ebay.\n\nDacă ai găsit acest mesaj folositor, consideră faptul să-i donezi programatorului\ndriverului pe site-ul lui.",
-    "macInstructionsText": "Pentru a folosi controllere de Xbox 360, va trebui să instalezi \ndriver-ul pentru Mac disponibil din link-ul de mai jos. \nFuncționează pentru controalele cu/fără fir.",
+    "macInstructionsText": "Pentru a folosi controllere de Xbox 360, va trebui să instalezi \ndriver-ul pentru Mac disponibil din link-ul de mai jos. \nFuncționează pentru controalele cu/fără fir. ",
     "ouyaInstructionsText": "Pentru a folosi controllere de Xbox 360 cu fir, pur și simplu\nconectează-le la un port USB. Poți folosi un USB-hub pentru a\nconecta mai multe controllere.\n\nPentru a folosi controllere fără fir vei avea nevoie de un receptor\nwireless, valabil ca parte a pachetului \"Xbox 360 wireless controller\nfor Windows\" sau vândut separat. Fiecare receptor intră într-un port\nUSB și te lasă să conectezi până la 4 controllere.",
     "titleText": "Se folosesc controllere de Xbox 360 cu ${APP_NAME}:"
   },

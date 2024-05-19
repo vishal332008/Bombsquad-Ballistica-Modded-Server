@@ -73,7 +73,7 @@ class _Inputter:
         if issubclass(self._cls, IOMultiType) and not dataclasses.is_dataclass(
             self._cls
         ):
-            type_id_val = values.get(self._cls.ID_STORAGE_NAME)
+            type_id_val = values.get(self._cls.get_type_id_storage_name())
             if type_id_val is None:
                 raise ValueError(
                     f'No type id value present for multi-type object:'
@@ -193,6 +193,9 @@ class _Inputter:
         if issubclass(origin, datetime.datetime):
             return self._datetime_from_input(cls, fieldpath, value, ioattrs)
 
+        if issubclass(origin, datetime.timedelta):
+            return self._timedelta_from_input(cls, fieldpath, value, ioattrs)
+
         if origin is bytes:
             return self._bytes_from_input(origin, fieldpath, value)
 
@@ -234,6 +237,7 @@ class _Inputter:
         associated values, and nested dataclasses should be passed as dicts.
         """
         # pylint: disable=too-many-locals
+        # pylint: disable=too-many-statements
         # pylint: disable=too-many-branches
         if not isinstance(values, dict):
             raise TypeError(
@@ -252,8 +256,8 @@ class _Inputter:
         fields = dataclasses.fields(cls)
         fields_by_name = {f.name: f for f in fields}
 
-        # Preprocess all fields to convert Annotated[] to contained types
-        # and IOAttrs.
+        # Preprocess all fields to convert Annotated[] to contained
+        # types and IOAttrs.
         parsed_field_annotations = {
             f.name: _parse_annotated(prep.annotations[f.name]) for f in fields
         }
@@ -262,12 +266,25 @@ class _Inputter:
         # type attr. Ignore that while parsing since we already have a
         # definite type and it will just pollute extra-attrs otherwise.
         if issubclass(cls, IOMultiType):
-            type_id_store_name = cls.ID_STORAGE_NAME
+            type_id_store_name = cls.get_type_id_storage_name()
+
+            # However we do want to make sure the class we're loading
+            # doesn't itself use this same name, as this could lead to
+            # tricky breakage. We can't verify this for types at prep
+            # time because IOMultiTypes are lazy-loaded, so this is
+            # the best we can do.
+            if type_id_store_name in fields_by_name:
+                raise RuntimeError(
+                    f"{cls} contains a '{type_id_store_name}' field"
+                    ' which clashes with the type-id-storage-name of'
+                    ' the IOMultiType it inherits from.'
+                )
+
         else:
             type_id_store_name = None
 
-        # Go through all data in the input, converting it to either dataclass
-        # args or extra data.
+        # Go through all data in the input, converting it to either
+        # dataclass args or extra data.
         args: dict[str, Any] = {}
         for rawkey, value in values.items():
 
@@ -284,8 +301,8 @@ class _Inputter:
                     if self._discard_unknown_attrs:
                         continue
 
-                    # Treat this like 'Any' data; ensure that it is valid
-                    # raw json.
+                    # Treat this like 'Any' data; ensure that it is
+                    # valid raw json.
                     if not _is_valid_for_codec(value, self._codec):
                         raise TypeError(
                             f'Unknown attr \'{key}\''
@@ -534,42 +551,6 @@ class _Inputter:
             for i in value
         )
 
-    def _datetime_from_input(
-        self, cls: type, fieldpath: str, value: Any, ioattrs: IOAttrs | None
-    ) -> Any:
-        # For firestore we expect a datetime object.
-        if self._codec is Codec.FIRESTORE:
-            # Don't compare exact type here, as firestore can give us
-            # a subclass with extended precision.
-            if not isinstance(value, datetime.datetime):
-                raise TypeError(
-                    f'Invalid input value for "{fieldpath}" on'
-                    f' "{cls.__name__}";'
-                    f' expected a datetime, got a {type(value).__name__}'
-                )
-            check_utc(value)
-            return value
-
-        assert self._codec is Codec.JSON
-
-        # We expect a list of 7 ints.
-        if type(value) is not list:
-            raise TypeError(
-                f'Invalid input value for "{fieldpath}" on "{cls.__name__}";'
-                f' expected a list, got a {type(value).__name__}'
-            )
-        if len(value) != 7 or not all(isinstance(x, int) for x in value):
-            raise ValueError(
-                f'Invalid input value for "{fieldpath}" on "{cls.__name__}";'
-                f' expected a list of 7 ints, got {[type(v) for v in value]}.'
-            )
-        out = datetime.datetime(  # type: ignore
-            *value, tzinfo=datetime.timezone.utc
-        )
-        if ioattrs is not None:
-            ioattrs.validate_datetime(out, fieldpath)
-        return out
-
     def _tuple_from_input(
         self,
         cls: type,
@@ -620,3 +601,59 @@ class _Inputter:
 
         assert len(out) == len(childanntypes)
         return tuple(out)
+
+    def _datetime_from_input(
+        self, cls: type, fieldpath: str, value: Any, ioattrs: IOAttrs | None
+    ) -> Any:
+        # For firestore we expect a datetime object.
+        if self._codec is Codec.FIRESTORE:
+            # Don't compare exact type here, as firestore can give us
+            # a subclass with extended precision.
+            if not isinstance(value, datetime.datetime):
+                raise TypeError(
+                    f'Invalid input value for "{fieldpath}" on'
+                    f' "{cls.__name__}";'
+                    f' expected a datetime, got a {type(value).__name__}'
+                )
+            check_utc(value)
+            return value
+
+        assert self._codec is Codec.JSON
+
+        # We expect a list of 7 ints.
+        if type(value) is not list:
+            raise TypeError(
+                f'Invalid input value for "{fieldpath}" on "{cls.__name__}";'
+                f' expected a list, got a {type(value).__name__}'
+            )
+        if len(value) != 7 or not all(isinstance(x, int) for x in value):
+            raise ValueError(
+                f'Invalid input value for "{fieldpath}" on "{cls.__name__}";'
+                f' expected a list of 7 ints, got {[type(v) for v in value]}.'
+            )
+        out = datetime.datetime(  # type: ignore
+            *value, tzinfo=datetime.timezone.utc
+        )
+        if ioattrs is not None:
+            ioattrs.validate_datetime(out, fieldpath)
+        return out
+
+    def _timedelta_from_input(
+        self, cls: type, fieldpath: str, value: Any, ioattrs: IOAttrs | None
+    ) -> Any:
+        del ioattrs  # Unused.
+        # We expect a list of 3 ints.
+        if type(value) is not list:
+            raise TypeError(
+                f'Invalid input value for "{fieldpath}" on "{cls.__name__}";'
+                f' expected a list, got a {type(value).__name__}'
+            )
+        if len(value) != 3 or not all(isinstance(x, int) for x in value):
+            raise ValueError(
+                f'Invalid input value for "{fieldpath}" on "{cls.__name__}";'
+                f' expected a list of 3 ints, got {[type(v) for v in value]}.'
+            )
+        out = datetime.timedelta(
+            days=value[0], seconds=value[1], microseconds=value[2]
+        )
+        return out

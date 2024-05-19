@@ -5,9 +5,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING
-
-from typing_extensions import override
+from typing import TYPE_CHECKING, override
 
 from bauiv1lib.popup import PopupWindow
 import bauiv1 as bui
@@ -41,9 +39,7 @@ class CharacterPicker(PopupWindow):
             scale = (
                 1.85
                 if uiscale is bui.UIScale.SMALL
-                else 1.65
-                if uiscale is bui.UIScale.MEDIUM
-                else 1.23
+                else 1.65 if uiscale is bui.UIScale.MEDIUM else 1.23
             )
 
         self._delegate = delegate

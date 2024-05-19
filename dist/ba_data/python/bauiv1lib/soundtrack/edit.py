@@ -35,9 +35,7 @@ class SoundtrackEditWindow(bui.Window):
         self._height = (
             395
             if uiscale is bui.UIScale.SMALL
-            else 450
-            if uiscale is bui.UIScale.MEDIUM
-            else 560
+            else 450 if uiscale is bui.UIScale.MEDIUM else 560
         )
         super().__init__(
             root_widget=bui.containerwidget(
@@ -46,15 +44,13 @@ class SoundtrackEditWindow(bui.Window):
                 scale=(
                     2.08
                     if uiscale is bui.UIScale.SMALL
-                    else 1.5
-                    if uiscale is bui.UIScale.MEDIUM
-                    else 1.0
+                    else 1.5 if uiscale is bui.UIScale.MEDIUM else 1.0
                 ),
-                stack_offset=(0, -48)
-                if uiscale is bui.UIScale.SMALL
-                else (0, 15)
-                if uiscale is bui.UIScale.MEDIUM
-                else (0, 0),
+                stack_offset=(
+                    (0, -48)
+                    if uiscale is bui.UIScale.SMALL
+                    else (0, 15) if uiscale is bui.UIScale.MEDIUM else (0, 0)
+                ),
             )
         )
         cancel_button = bui.buttonwidget(
@@ -266,13 +262,11 @@ class SoundtrackEditWindow(bui.Window):
                 icon=(
                     self._file_tex
                     if icon_type == 'file'
-                    else self._folder_tex
-                    if icon_type == 'folder'
-                    else None
+                    else self._folder_tex if icon_type == 'folder' else None
                 ),
-                icon_color=(1.1, 0.8, 0.2)
-                if icon_type == 'folder'
-                else (1, 1, 1),
+                icon_color=(
+                    (1.1, 0.8, 0.2) if icon_type == 'folder' else (1, 1, 1)
+                ),
                 left_widget=self._text_field,
                 iconscale=0.7,
                 autoselect=True,
@@ -314,9 +308,11 @@ class SoundtrackEditWindow(bui.Window):
                 label=bui.Lstr(resource=self._r + '.testText'),
                 text_scale=0.6,
                 on_activate_call=bui.Call(self._test, bs.MusicType(song_type)),
-                up_widget=prev_test_button
-                if prev_test_button is not None
-                else self._text_field,
+                up_widget=(
+                    prev_test_button
+                    if prev_test_button is not None
+                    else self._text_field
+                ),
             )
             if prev_test_button is not None:
                 bui.widget(edit=prev_test_button, down_widget=btn)
@@ -427,7 +423,7 @@ class SoundtrackEditWindow(bui.Window):
         return None
 
     def _cancel(self) -> None:
-        from bauiv1lib.soundtrack import browser as stb
+        from bauiv1lib.soundtrack.browser import SoundtrackBrowserWindow
 
         # no-op if our underlying widget is dead or on its way out.
         if not self._root_widget or self._root_widget.transitioning_out:
@@ -440,12 +436,12 @@ class SoundtrackEditWindow(bui.Window):
         music.set_music_play_mode(bui.app.classic.MusicPlayMode.REGULAR)
         bui.containerwidget(edit=self._root_widget, transition='out_right')
         bui.app.ui_v1.set_main_menu_window(
-            stb.SoundtrackBrowserWindow(transition='in_left').get_root_widget(),
+            SoundtrackBrowserWindow(transition='in_left').get_root_widget(),
             from_window=self._root_widget,
         )
 
     def _do_it(self) -> None:
-        from bauiv1lib.soundtrack import browser as stb
+        from bauiv1lib.soundtrack.browser import SoundtrackBrowserWindow
 
         # no-op if our underlying widget is dead or on its way out.
         if not self._root_widget or self._root_widget.transitioning_out:
@@ -499,7 +495,7 @@ class SoundtrackEditWindow(bui.Window):
         )
 
         bui.app.ui_v1.set_main_menu_window(
-            stb.SoundtrackBrowserWindow(transition='in_left').get_root_widget(),
+            SoundtrackBrowserWindow(transition='in_left').get_root_widget(),
             from_window=self._root_widget,
         )
 

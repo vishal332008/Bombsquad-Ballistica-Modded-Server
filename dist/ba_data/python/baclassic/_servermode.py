@@ -102,8 +102,8 @@ class ServerController:
         self._shutdown_reason: ShutdownReason | None = None
         self._executing_shutdown = False
 
-        # Make note if they want us to import a playlist;
-        # we'll need to do that first if so.
+        # Make note if they want us to import a playlist; we'll need to
+        # do that first if so.
         self._playlist_fetch_running = self._config.playlist_code is not None
         self._playlist_fetch_sent_request = False
         self._playlist_fetch_got_response = False
@@ -216,7 +216,7 @@ class ServerController:
             'bsAccessCheck',
             {
                 'port': bascenev1.get_game_port(),
-                'b': babase.app.env.build_number,
+                'b': babase.app.env.engine_build_number,
             },
             callback=self._access_check_response,
         )
@@ -304,7 +304,7 @@ class ServerController:
     ) -> None:
         if result is None:
             print('Error fetching playlist; aborting.')
-            print('Falling back to use default playlist.') #BCS
+            print('Falling back to use default playlist.')
             self._config.session_type = "teams"
             self._prep_timer = None
             babase.pushcall(self._launch_server_session)
@@ -314,9 +314,7 @@ class ServerController:
         typename = (
             'teams'
             if result['playlistType'] == 'Team Tournament'
-            else 'ffa'
-            if result['playlistType'] == 'Free-for-All'
-            else '??'
+            else 'ffa' if result['playlistType'] == 'Free-for-All' else '??'
         )
         plistname = result['playlistName']
         print(f'{Clr.SBLU}Got playlist: "{plistname}" ({typename}).{Clr.RST}')
@@ -372,7 +370,8 @@ class ServerController:
                 raise RuntimeError(f'Unknown session type {sessiontype}')
 
             # Need to add this in a transaction instead of just setting
-            # it directly or it will get overwritten by the master-server.
+            # it directly or it will get overwritten by the
+            # master-server.
             plus.add_v1_account_transaction(
                 {
                     'type': 'ADD_PLAYLIST',
@@ -386,22 +385,23 @@ class ServerController:
         if self._first_run:
             curtimestr = time.strftime('%c')
             startupmsg = (
-                f'{Clr.BLD}{Clr.BLU}{babase.appnameupper()} {app.env.version}'
-                f' ({app.env.build_number})'
+                f'{Clr.BLD}{Clr.BLU}{babase.appnameupper()}'
+                f' {app.env.engine_version}'
+                f' ({app.env.engine_build_number})'
                 f' entering server-mode {curtimestr}{Clr.RST}'
             )
             logging.info(startupmsg)
 
         if sessiontype is bascenev1.FreeForAllSession:
             appcfg['Free-for-All Playlist Selection'] = self._playlist_name
-            appcfg[
-                'Free-for-All Playlist Randomize'
-            ] = self._config.playlist_shuffle
+            appcfg['Free-for-All Playlist Randomize'] = (
+                self._config.playlist_shuffle
+            )
         elif sessiontype is bascenev1.DualTeamSession:
             appcfg['Team Tournament Playlist Selection'] = self._playlist_name
-            appcfg[
-                'Team Tournament Playlist Randomize'
-            ] = self._config.playlist_shuffle
+            appcfg['Team Tournament Playlist Randomize'] = (
+                self._config.playlist_shuffle
+            )
         elif sessiontype is bascenev1.CoopSession:
             classic.coop_session_args = {
                 'campaign': self._config.coop_campaign,
@@ -410,6 +410,10 @@ class ServerController:
         else:
             raise RuntimeError(f'Unknown session type {sessiontype}')
 
+        appcfg['Teams Series Length'] = self._config.teams_series_length
+        appcfg['FFA Series Length'] = self._config.ffa_series_length
+
+        # Deprecated; left here in order to not break mods.
         classic.teams_series_length = self._config.teams_series_length
         classic.ffa_series_length = self._config.ffa_series_length
 
@@ -425,10 +429,21 @@ class ServerController:
         bascenev1.set_public_party_queue_enabled(self._config.enable_queue)
         bascenev1.set_public_party_name(self._config.party_name)
         bascenev1.set_public_party_stats_url(self._config.stats_url)
+        bascenev1.set_public_party_public_address_ipv4(
+            self._config.public_ipv4_address
+        )
+        bascenev1.set_public_party_public_address_ipv6(
+            self._config.public_ipv6_address
+        )
+
         bascenev1.set_public_party_enabled(self._config.party_is_public)
 
         bascenev1.set_player_rejoin_cooldown(
             self._config.player_rejoin_cooldown
+        )
+
+        bascenev1.set_max_players_override(
+            self._config.session_max_players_override
         )
 
         # And here.. we.. go.

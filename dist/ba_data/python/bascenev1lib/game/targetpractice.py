@@ -8,9 +8,8 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
-from typing_extensions import override
 import bascenev1 as bs
 
 from bascenev1lib.actor.scoreboard import Scoreboard
@@ -321,11 +320,15 @@ class Target(bs.Actor):
                     bs.getsound(
                         'orchestraHit4'
                         if streak > 3
-                        else 'orchestraHit3'
-                        if streak > 2
-                        else 'orchestraHit2'
-                        if streak > 1
-                        else 'orchestraHit'
+                        else (
+                            'orchestraHit3'
+                            if streak > 2
+                            else (
+                                'orchestraHit2'
+                                if streak > 1
+                                else 'orchestraHit'
+                            )
+                        )
                     ).play()
             elif dist <= self._r2 + self._rfudge:
                 self._nodes[0].color = cdull

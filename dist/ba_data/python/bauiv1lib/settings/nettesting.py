@@ -37,9 +37,7 @@ class NetTestingWindow(bui.Window):
                 scale=(
                     1.56
                     if uiscale is bui.UIScale.SMALL
-                    else 1.2
-                    if uiscale is bui.UIScale.MEDIUM
-                    else 0.8
+                    else 1.2 if uiscale is bui.UIScale.MEDIUM else 0.8
                 ),
                 stack_offset=(0.0, -7 if uiscale is bui.UIScale.SMALL else 0.0),
                 transition=transition,
@@ -164,6 +162,7 @@ class NetTestingWindow(bui.Window):
 
 def _run_diagnostics(weakwin: weakref.ref[NetTestingWindow]) -> None:
     # pylint: disable=too-many-statements
+    # pylint: disable=too-many-branches
 
     from efro.util import utc_now
 
@@ -250,8 +249,11 @@ def _run_diagnostics(weakwin: weakref.ref[NetTestingWindow]) -> None:
         curv1addr = plus.get_master_server_address(version=1)
         _print(f'\nUsing V1 address: {curv1addr}')
 
-        _print('\nRunning V1 transaction...')
-        _print_test_results(_test_v1_transaction)
+        if plus.get_v1_account_state() == 'signed_in':
+            _print('\nRunning V1 transaction...')
+            _print_test_results(_test_v1_transaction)
+        else:
+            _print('\nSkipping V1 transaction (Not signed into V1).')
 
         # V2 ping
         baseaddr = plus.get_master_server_address(version=2)

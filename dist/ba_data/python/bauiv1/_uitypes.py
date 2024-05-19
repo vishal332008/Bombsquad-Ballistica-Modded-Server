@@ -7,9 +7,8 @@ from __future__ import annotations
 import os
 import weakref
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
-from typing_extensions import override
 import babase
 
 import _bauiv1
@@ -164,9 +163,7 @@ class UIController:
         entrynew = (
             self._dialog_stack[-1]
             if self._dialog_stack
-            else self._main_stack[-1]
-            if self._main_stack
-            else None
+            else self._main_stack[-1] if self._main_stack else None
         )
         if entrynew is not None:
             entrynew.create()

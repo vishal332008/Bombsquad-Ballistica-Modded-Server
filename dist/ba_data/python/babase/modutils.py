@@ -133,10 +133,15 @@ def create_user_system_scripts() -> None:
     if env.python_directory_app is None:
         raise RuntimeError('app python dir unset')
 
-    path = f'{env.python_directory_user}/sys/{env.version}'
+    path = f'{env.python_directory_user}/sys/{env.engine_version}'
     pathtmp = path + '_tmp'
     if os.path.exists(path):
-        shutil.rmtree(path)
+        print('Delete Existing User Scripts first!')
+        _babase.screenmessage(
+            'Delete Existing User Scripts first!',
+            color=(1, 0, 0),
+        )
+        return
     if os.path.exists(pathtmp):
         shutil.rmtree(pathtmp)
 
@@ -159,6 +164,7 @@ def create_user_system_scripts() -> None:
         f"'\nRestart {_babase.appname()} to use them."
         f' (use babase.quit() to exit the game)'
     )
+    _babase.screenmessage('Created User System Scripts', color=(0, 1, 0))
     if app.classic is not None and app.classic.platform == 'android':
         print(
             'Note: the new files may not be visible via '
@@ -175,16 +181,18 @@ def delete_user_system_scripts() -> None:
     if env.python_directory_user is None:
         raise RuntimeError('user python dir unset')
 
-    path = f'{env.python_directory_user}/sys/{env.version}'
+    path = f'{env.python_directory_user}/sys/{env.engine_version}'
     if os.path.exists(path):
         shutil.rmtree(path)
-        print(
-            f'User system scripts deleted.\n'
-            f'Restart {_babase.appname()} to use internal'
-            f' scripts. (use babase.quit() to exit the game)'
+        print('User system scripts deleted.')
+        _babase.screenmessage('Deleted User System Scripts', color=(0, 1, 0))
+        _babase.screenmessage(
+            f'Closing {_babase.appname()} to make changes.', color=(0, 1, 0)
         )
+        _babase.apptimer(2.0, _babase.quit)
     else:
         print(f"User system scripts not found at '{path}'.")
+        _babase.screenmessage('User Scripts Not Found', color=(1, 0, 0))
 
     # If the sys path is empty, kill it.
     dpath = env.python_directory_user + '/sys'

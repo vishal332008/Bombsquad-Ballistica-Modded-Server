@@ -3,9 +3,8 @@
 """Some handy base class and special purpose Activity types."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
-from typing_extensions import override
 import babase
 
 import _bascenev1
@@ -203,9 +202,11 @@ class ScoreScreenActivity(Activity[EmptyPlayer, EmptyTeam]):
             sval = babase.Lstr(resource='pressAnyButtonText')
 
         Text(
-            self._custom_continue_message
-            if self._custom_continue_message is not None
-            else sval,
+            (
+                self._custom_continue_message
+                if self._custom_continue_message is not None
+                else sval
+            ),
             v_attach=Text.VAttach.BOTTOM,
             h_align=Text.HAlign.CENTER,
             flash=True,

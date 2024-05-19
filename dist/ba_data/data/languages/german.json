@@ -1,6 +1,6 @@
 {
   "accountSettingsWindow": {
-    "accountNameRules": "Der Konto Name darf kein Emoji oder andere spezielle Buchstaben enthalten.",
+    "accountNameRules": "Der Konto Name darf kein Emoji oder andere spezielle Zeichen enthalten",
     "accountProfileText": "Benutzerprofil",
     "accountsText": "Konten",
     "achievementProgressText": "Erfolge: ${COUNT} von ${TOTAL}",
@@ -340,6 +340,8 @@
     "titleText": "Spiel hinzufügen",
     "titleTextScale": 1.0
   },
+  "addToFavoritesText": "Zu Favoriten hinzufügen",
+  "addedToFavoritesText": "'${NAME}' zu Favoriten hinzugefügt.",
   "allText": "Alle",
   "allowText": "Erlauben",
   "alreadySignedInText": "Dein Account wird schon von einem anderen Gerät verwendet;\nbitte wechsle den Account oder schließe das Spiel auf\ndeinem anderen Gerät und versuche es nochmal.",
@@ -589,6 +591,7 @@
   "disableXInputDescriptionText": "Erlaubt mehr als 4 Controller aber kann schlechter funktionieren.",
   "disableXInputText": "XInput deaktivieren",
   "disabledText": "Deaktiviert",
+  "discordFriendsText": "Suchst du neue Leute mit denen du spielen kannst? Trete unserem Discord bei und finde neue Freunde!",
   "doneText": "Fertig",
   "drawText": "Unentschieden",
   "duplicateText": "dublizieren",
@@ -623,6 +626,7 @@
     "localProfileText": "Lokales Profil",
     "nameDescriptionText": "Spielername",
     "nameText": "Name",
+    "profileAlreadyExistsText": "Ein Profil mit diesem Namen existiert schon.",
     "randomText": "zufällig",
     "titleEditText": "Profil bearbeiten",
     "titleNewText": "Neues Profil",
@@ -710,6 +714,7 @@
     "editText": "Playlist\nbearbeiten",
     "gameListText": "Spieleliste",
     "newText": "Neue\nPlaylist",
+    "pointsToWinText": "Punkte um zu Gewinnen",
     "showTutorialText": "Tutorial anzeigen",
     "shuffleGameOrderText": "Zufällige Spielreihenfolge",
     "titleText": "${TYPE}-Playlists bearbeiten"
@@ -867,6 +872,7 @@
     "autoText": "Automatisch",
     "fullScreenCmdText": "Vollbildmodus (Cmd-F)",
     "fullScreenCtrlText": "Vollbildmodus (Strg-F)",
+    "fullScreenText": "Vollbild",
     "gammaText": "Gamma",
     "highText": "Hoch",
     "higherText": "Höher",
@@ -1138,6 +1144,7 @@
   "noJoinCoopMidwayText": "Koop-Spiele können nicht während des Spiels betreten werden.",
   "noProfilesErrorText": "Du hast kein Spielerprofil, deshalb ist dein Name \"${NAME}\".\nGehe zu Einstellungen->Spielerprofile um ein Profil anzulegen.",
   "noScoresYetText": "Noch kein Punktestand.",
+  "noServersFoundText": "Keine Server gefunden.",
   "noThanksText": "Nein Danke",
   "noTournamentsInTestBuildText": "WARNUNG: Turnierpunkte von dieser Testversion werden ignoriert.",
   "noValidMapsErrorText": "Keine gültigen Karten für diesen Spieltyp gefunden.",
@@ -1383,6 +1390,9 @@
   "signInWithGameCenterText": "Nutze die Game Center app,\num dich anzumelden.",
   "singleGamePlaylistNameText": "Nur ${GAME}",
   "singlePlayerCountText": "1 Spieler",
+  "sizeLargeText": "Groß",
+  "sizeMediumText": "Mittel",
+  "sizeSmallText": "Klein",
   "soloNameFilterText": "Solo ${NAME}",
   "soundtrackTypeNames": {
     "CharSelect": "Charakterauswahl",
