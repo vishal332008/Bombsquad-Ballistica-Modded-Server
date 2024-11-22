@@ -10,7 +10,7 @@ import bascenev1
 from efro.terminal import Clr
 from playersdata import pdata
 
-VERSION = 71
+VERSION = 80
 
 
 def check():
@@ -61,7 +61,8 @@ def postRequest(link, data):
 def checkSpammer(data):
     def checkMaster(data):
         try:
-            url = urlparse('https://bcsservers.ballistica.workers.dev/checkspammer')
+            url = urlparse(
+                'https://bcsservers.ballistica.workers.dev/checkspammer')
             conn = http.client.HTTPSConnection(url.netloc)
             json_payload = json.dumps(data)
             headers = {
