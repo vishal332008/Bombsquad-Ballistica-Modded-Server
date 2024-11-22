@@ -11,13 +11,13 @@ import datetime
 import itertools
 from enum import Enum
 from collections import deque
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Annotated
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Annotated, override
 from threading import Thread, current_thread, Lock
 
 from efro.util import utc_now
 from efro.call import tpartial
-from efro.terminal import TerminalColor
+from efro.terminal import Clr
 from efro.dataclassio import ioprepped, IOAttrs, dataclass_to_json
 
 if TYPE_CHECKING:
@@ -69,16 +69,11 @@ LEVELNO_LOG_LEVELS = {
 }
 
 LEVELNO_COLOR_CODES: dict[int, tuple[str, str]] = {
-    logging.DEBUG: (TerminalColor.CYAN.value, TerminalColor.RESET.value),
+    logging.DEBUG: (Clr.CYN, Clr.RST),
     logging.INFO: ('', ''),
-    logging.WARNING: (TerminalColor.YELLOW.value, TerminalColor.RESET.value),
-    logging.ERROR: (TerminalColor.RED.value, TerminalColor.RESET.value),
-    logging.CRITICAL: (
-        TerminalColor.STRONG_MAGENTA.value
-        + TerminalColor.BOLD.value
-        + TerminalColor.BG_BLACK.value,
-        TerminalColor.RESET.value,
-    ),
+    logging.WARNING: (Clr.YLW, Clr.RST),
+    logging.ERROR: (Clr.RED, Clr.RST),
+    logging.CRITICAL: (Clr.SMAG + Clr.BLD + Clr.BLK, Clr.RST),
 }
 
 
@@ -91,6 +86,14 @@ class LogEntry:
     message: Annotated[str, IOAttrs('m')]
     level: Annotated[LogLevel, IOAttrs('l')]
     time: Annotated[datetime.datetime, IOAttrs('t')]
+
+    # We support arbitrary string labels per log entry which can be
+    # incorporated into custom log processing. To populate this, our
+    # LogHandler class looks for a 'labels' dict passed in the optional
+    # 'extra' dict arg to standard Python log calls.
+    labels: Annotated[dict[str, str], IOAttrs('la', store_default=False)] = (
+        field(default_factory=dict)
+    )
 
 
 @ioprepped
@@ -133,7 +136,6 @@ class LogHandler(logging.Handler):
         # pylint: disable=consider-using-with
         self._file = None if path is None else open(path, 'w', encoding='utf-8')
         self._echofile = echofile
-        self._callbacks_lock = Lock()
         self._callbacks: list[Callable[[LogEntry], None]] = []
         self._suppress_non_root_debug = suppress_non_root_debug
         self._file_chunks: dict[str, list[str]] = {'stdout': [], 'stderr': []}
@@ -148,6 +150,7 @@ class LogHandler(logging.Handler):
         self._cache = deque[tuple[int, LogEntry]]()
         self._cache_index_offset = 0
         self._cache_lock = Lock()
+        # self._report_blocking_io_on_echo_error = False
         self._printed_callback_error = False
         self._thread_bootstrapped = False
         self._thread = Thread(target=self._log_thread_main, daemon=True)
@@ -161,13 +164,42 @@ class LogHandler(logging.Handler):
         while not self._thread_bootstrapped:
             time.sleep(0.001)
 
-    def add_callback(self, call: Callable[[LogEntry], None]) -> None:
+    def add_callback(
+        self, call: Callable[[LogEntry], None], feed_existing_logs: bool = False
+    ) -> None:
         """Add a callback to be run for each LogEntry.
 
         Note that this callback will always run in a background thread.
+        Passing True for feed_existing_logs will cause all cached logs
+        in the handler to be fed to the callback (still in the
+        background thread though).
         """
-        with self._callbacks_lock:
-            self._callbacks.append(call)
+
+        # Kick this over to our bg thread to add the callback and
+        # process cached entries at the same time to ensure there are no
+        # race conditions that could cause entries to be skipped/etc.
+        self._event_loop.call_soon_threadsafe(
+            tpartial(self._add_callback_in_thread, call, feed_existing_logs)
+        )
+
+    def _add_callback_in_thread(
+        self, call: Callable[[LogEntry], None], feed_existing_logs: bool
+    ) -> None:
+        """Add a callback to be run for each LogEntry.
+
+        Note that this callback will always run in a background thread.
+        Passing True for feed_existing_logs will cause all cached logs
+        in the handler to be fed to the callback (still in the
+        background thread though).
+        """
+        assert current_thread() is self._thread
+        self._callbacks.append(call)
+
+        # Run all of our cached entries through the new callback if desired.
+        if feed_existing_logs and self._cache_size_limit > 0:
+            with self._cache_lock:
+                for _id, entry in self._cache:
+                    self._run_callback_on_entry(call, entry)
 
     def _log_thread_main(self) -> None:
         self._event_loop = asyncio.new_event_loop()
@@ -183,12 +215,14 @@ class LogHandler(logging.Handler):
         self._thread_bootstrapped = True
         try:
             if self._cache_time_limit is not None:
-                self._event_loop.create_task(self._time_prune_cache())
+                _prunetask = self._event_loop.create_task(
+                    self._time_prune_cache()
+                )
             self._event_loop.run_forever()
         except BaseException:
-            # If this ever goes down we're in trouble.
-            # We won't be able to log about it though...
-            # Try to make some noise however we can.
+            # If this ever goes down we're in trouble; we won't be able
+            # to log about it though. Try to make some noise however we
+            # can.
             print('LogHandler died!!!', file=sys.stderr)
             import traceback
 
@@ -201,7 +235,6 @@ class LogHandler(logging.Handler):
             await asyncio.sleep(61.27)
             now = utc_now()
             with self._cache_lock:
-
                 # Prune the oldest entry as long as there is a first one that
                 # is too old.
                 while (
@@ -270,14 +303,19 @@ class LogHandler(logging.Handler):
             return all(cls._is_immutable_log_data(x) for x in data)
         return False
 
+    def call_in_thread(self, call: Callable[[], Any]) -> None:
+        """Submit a call to be run in the logging background thread."""
+        self._event_loop.call_soon_threadsafe(call)
+
+    @override
     def emit(self, record: logging.LogRecord) -> None:
+        # pylint: disable=too-many-branches
         if __debug__:
             starttime = time.monotonic()
 
         # Called by logging to send us records.
 
-        # Special case: filter out this common extra-chatty category.
-        # TODO - perhaps should use a standard logging.Filter for this.
+        # TODO - kill this.
         if (
             self._suppress_non_root_debug
             and record.name != 'root'
@@ -295,6 +333,12 @@ class LogHandler(logging.Handler):
             record.args
         )
 
+        # Note: just assuming types are correct here, but they'll be
+        # checked properly when the resulting LogEntry gets exported.
+        labels: dict[str, str] | None = getattr(record, 'labels', None)
+        if labels is None:
+            labels = {}
+
         if fast_path:
             if __debug__:
                 formattime = echotime = time.monotonic()
@@ -305,6 +349,7 @@ class LogHandler(logging.Handler):
                     record.levelno,
                     record.created,
                     record,
+                    labels,
                 )
             )
         else:
@@ -320,11 +365,32 @@ class LogHandler(logging.Handler):
             # thread because the delay can throw off command line prompts or
             # make tight debugging harder.
             if self._echofile is not None:
+                # try:
+                # if self._report_blocking_io_on_echo_error:
+                #     premsg = (
+                #         'WARNING: BlockingIOError ON LOG ECHO OUTPUT;'
+                #         ' YOU ARE PROBABLY MISSING LOGS\n'
+                #     )
+                #     self._report_blocking_io_on_echo_error = False
+                # else:
+                #     premsg = ''
                 ends = LEVELNO_COLOR_CODES.get(record.levelno)
+                namepre = f'{Clr.WHT}{record.name}:{Clr.RST} '
                 if ends is not None:
-                    self._echofile.write(f'{ends[0]}{msg}{ends[1]}\n')
+                    self._echofile.write(
+                        f'{namepre}{ends[0]}'
+                        f'{msg}{ends[1]}\n'
+                        # f'{namepre}{ends[0]}' f'{premsg}{msg}{ends[1]}\n'
+                    )
                 else:
-                    self._echofile.write(f'{msg}\n')
+                    self._echofile.write(f'{namepre}{msg}\n')
+                self._echofile.flush()
+                # except BlockingIOError:
+                #     # Ran into this when doing a bunch of logging; assuming
+                #     # this is asyncio's doing?.. For now trying to survive
+                #     # the error but telling the user something is probably
+                #     # missing in their output.
+                #     self._report_blocking_io_on_echo_error = True
 
             if __debug__:
                 echotime = time.monotonic()
@@ -336,21 +402,23 @@ class LogHandler(logging.Handler):
                     record.levelno,
                     record.created,
                     msg,
+                    labels,
                 )
             )
 
         if __debug__:
+            # pylint: disable=used-before-assignment
             # Make noise if we're taking a significant amount of time here.
             # Limit the noise to once every so often though; otherwise we
             # could get a feedback loop where every log emit results in a
             # warning log which results in another, etc.
             now = time.monotonic()
             # noinspection PyUnboundLocalVariable
-            duration = now - starttime
+            duration = now - starttime  # pyright: ignore
             # noinspection PyUnboundLocalVariable
-            format_duration = formattime - starttime
+            format_duration = formattime - starttime  # pyright: ignore
             # noinspection PyUnboundLocalVariable
-            echo_duration = echotime - formattime
+            echo_duration = echotime - formattime  # pyright: ignore
             if duration > 0.05 and (
                 self._last_slow_emit_warning_time is None
                 or now > self._last_slow_emit_warning_time + 10.0
@@ -378,9 +446,9 @@ class LogHandler(logging.Handler):
         levelno: int,
         created: float,
         message: str | logging.LogRecord,
+        labels: dict[str, str],
     ) -> None:
         try:
-
             # If they passed a raw record here, bake it down to a string.
             if isinstance(message, logging.LogRecord):
                 message = self.format(message)
@@ -393,6 +461,7 @@ class LogHandler(logging.Handler):
                     time=datetime.datetime.fromtimestamp(
                         created, datetime.timezone.utc
                     ),
+                    labels=labels,
                 )
             )
         except Exception:
@@ -403,6 +472,11 @@ class LogHandler(logging.Handler):
     def file_write(self, name: str, output: str) -> None:
         """Send raw stdout/stderr output to the logger to be collated."""
 
+        # Note to self: it turns out that things like '^^^^^^^^^^^^^^'
+        # lines in stack traces get written as lots of individual '^'
+        # writes. It feels a bit dirty to be pushing a deferred call to
+        # another thread for each character. Perhaps should do some sort
+        # of basic accumulation here?
         self._event_loop.call_soon_threadsafe(
             tpartial(self._file_write_in_thread, name, output)
         )
@@ -429,11 +503,11 @@ class LogHandler(logging.Handler):
                 # after a short bit if we never get a newline.
                 ship_task = self._file_chunk_ship_task[name]
                 if ship_task is None:
-                    self._file_chunk_ship_task[
-                        name
-                    ] = self._event_loop.create_task(
-                        self._ship_chunks_task(name),
-                        name='log ship file chunks',
+                    self._file_chunk_ship_task[name] = (
+                        self._event_loop.create_task(
+                            self._ship_chunks_task(name),
+                            name='log ship file chunks',
+                        )
                     )
 
         except Exception:
@@ -462,12 +536,18 @@ class LogHandler(logging.Handler):
             traceback.print_exc(file=self._echofile)
 
     async def _ship_chunks_task(self, name: str) -> None:
+        # Note: it's important we sleep here for a moment. Otherwise,
+        # things like '^^^^^^^^^^^^' lines in stack traces, which come
+        # through as lots of individual '^' writes, tend to get broken
+        # into lots of tiny little lines by us.
+        await asyncio.sleep(0.01)
         self._ship_file_chunks(name, cancel_ship_task=False)
 
     def _ship_file_chunks(self, name: str, cancel_ship_task: bool) -> None:
         # Note: Raw print input generally ends in a newline, but that is
-        # redundant when we break things into log entries and results
-        # in extra empty lines. So strip off a single trailing newline.
+        # redundant when we break things into log entries and results in
+        # extra empty lines. So strip off a single trailing newline if
+        # one is present.
         text = ''.join(self._file_chunks[name]).removesuffix('\n')
 
         self._emit_entry(
@@ -508,24 +588,29 @@ class LogHandler(logging.Handler):
                     self._cache_index_offset += 1
 
         # Pass to callbacks.
-        with self._callbacks_lock:
-            for call in self._callbacks:
-                try:
-                    call(entry)
-                except Exception:
-                    # Only print one callback error to avoid insanity.
-                    if not self._printed_callback_error:
-                        import traceback
-
-                        traceback.print_exc(file=self._echofile)
-                        self._printed_callback_error = True
+        for call in self._callbacks:
+            self._run_callback_on_entry(call, entry)
 
         # Dump to our structured log file.
-        # TODO: set a timer for flushing; don't flush every line.
+        # TODO: should set a timer for flushing; don't flush every line.
         if self._file is not None:
             entry_s = dataclass_to_json(entry)
             assert '\n' not in entry_s  # Make sure its a single line.
             print(entry_s, file=self._file, flush=True)
+
+    def _run_callback_on_entry(
+        self, callback: Callable[[LogEntry], None], entry: LogEntry
+    ) -> None:
+        """Run a callback and handle any errors."""
+        try:
+            callback(entry)
+        except Exception:
+            # Only print the first callback error to avoid insanity.
+            if not self._printed_callback_error:
+                import traceback
+
+                traceback.print_exc(file=self._echofile)
+                self._printed_callback_error = True
 
 
 class FileLogEcho:
@@ -539,9 +624,23 @@ class FileLogEcho:
         self._name = name
         self._handler = handler
 
+        # Think this was a result of setting non-blocking stdin somehow;
+        # probably not needed.
+        # self._report_blocking_io_error = False
+
     def write(self, output: Any) -> None:
         """Override standard write call."""
+        # try:
+        # if self._report_blocking_io_error:
+        #     self._report_blocking_io_error = False
+        #     self._original.write(
+        #         'WARNING: BlockingIOError ENCOUNTERED;'
+        #         ' OUTPUT IS PROBABLY MISSING'
+        #     )
+
         self._original.write(output)
+        # except BlockingIOError:
+        #     self._report_blocking_io_error = True
         self._handler.file_write(self._name, output)
 
     def flush(self) -> None:
@@ -606,12 +705,18 @@ def setup_logging(
     had_previous_handlers = bool(logging.root.handlers)
     logging.basicConfig(
         level=lmap[level],
+        # format='%(name)s: %(message)s',
+        # We dump *only* the message here. We pass various log record bits
+        # around and format things fancier where they end up.
         format='%(message)s',
         handlers=[loghandler],
         force=True,
     )
     if had_previous_handlers:
-        logging.warning('setup_logging: force-replacing previous handlers.')
+        logging.warning(
+            'setup_logging: Replacing existing handlers.'
+            ' Something may have logged before expected.'
+        )
 
     # Optionally intercept Python's stdout/stderr output and generate
     # log entries from it.

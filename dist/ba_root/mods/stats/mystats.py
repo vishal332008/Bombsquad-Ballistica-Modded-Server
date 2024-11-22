@@ -1,14 +1,12 @@
-import setting
-import _ba
-import ba
+import datetime
 import json
 import os
 import shutil
 import threading
-import datetime
-
 import urllib.request
-from ba._activitytypes import *
+
+import _babase
+import setting
 
 damage_data = {}
 
@@ -17,7 +15,8 @@ top3Name = []
 
 our_settings = setting.get_settings_data()
 
-base_path = os.path.join(_ba.env()['python_directory_user'], "stats" + os.sep)
+base_path = os.path.join(_babase.env()['python_directory_user'],
+                         "stats" + os.sep)
 statsfile = base_path + 'stats.json'
 cached_stats = {}
 statsDefault = {
@@ -36,7 +35,6 @@ statsDefault = {
     }
 }
 
-
 seasonStartDate = None
 
 
@@ -47,15 +45,17 @@ def get_all_stats():
             try:
                 jsonData = json.loads(f.read())
             except:
-                f = open(statsfile+".backup", encoding='utf-8')
+                f = open(statsfile + ".backup", encoding='utf-8')
                 jsonData = json.load(f)
             try:
                 stats = jsonData["stats"]
                 seasonStartDate = datetime.datetime.strptime(
                     jsonData["startDate"], "%d-%m-%Y")
-                _ba.season_ends_in_days = our_settings["statsResetAfterDays"] - (
-                    datetime.datetime.now() - seasonStartDate).days
-                if (datetime.datetime.now() - seasonStartDate).days >= our_settings["statsResetAfterDays"]:
+                _babase.season_ends_in_days = our_settings[
+                                                  "statsResetAfterDays"] - (
+                                                  datetime.datetime.now() - seasonStartDate).days
+                if (datetime.datetime.now() - seasonStartDate).days >= \
+                    our_settings["statsResetAfterDays"]:
                     backupStatsFile()
                     seasonStartDate = datetime.datetime.now()
                     return statsDefault
@@ -69,7 +69,8 @@ def get_all_stats():
 
 def backupStatsFile():
     shutil.copy(statsfile, statsfile.replace(
-        ".json", "") + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + ".json")
+        ".json", "") + str(
+        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + ".json")
 
 
 def dump_stats(s: dict):
@@ -78,7 +79,7 @@ def dump_stats(s: dict):
         seasonStartDate = datetime.datetime.now()
     s = {"startDate": seasonStartDate.strftime("%d-%m-%Y"), "stats": s}
     if os.path.exists(statsfile):
-        shutil.copyfile(statsfile, statsfile+".backup")
+        shutil.copyfile(statsfile, statsfile + ".backup")
         with open(statsfile, 'w', encoding='utf8') as f:
             f.write(json.dumps(s, indent=4, ensure_ascii=False))
             f.close()
@@ -145,7 +146,7 @@ def refreshStats():
             if damage_data and aid in damage_data:
                 dmg = damage_data[aid]
                 dmg = str(str(dmg).split('.')[
-                          0] + '.' + str(dmg).split('.')[1][:3])
+                              0] + '.' + str(dmg).split('.')[1][:3])
             else:
                 dmg = 0
 
@@ -167,7 +168,7 @@ def refreshStats():
     dump_stats(pStats)
     updateTop3Names(toppersIDs[0:3])
 
-    from playersData import pdata
+    from playersdata import pdata
     pdata.update_toppers(toppersIDs)
 
 
@@ -217,9 +218,9 @@ class UpdateThread(threading.Thread):
         except:
             stats = {}
 
-        # now add this batch of kills to our persistant stats
+        # now add this batch of kills to our persistent stats
         for account_id, kill_count in self._account_kills.items():
-            # add a new entry for any accounts that dont have one
+            # add a new entry for any accounts that don't have one
             if account_id not in stats:
                 # also lets ask the master-server for their account-display-str.
                 # (we only do this when first creating the entry to save time,
@@ -227,7 +228,7 @@ class UpdateThread(threading.Thread):
                 # it may change)
 
                 stats[account_id] = {'rank': 0,
-                                     'name': "deafult name",
+                                     'name': "default name",
                                      'scores': 0,
                                      'total_damage': 0,
                                      'kills': 0,

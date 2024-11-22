@@ -3,58 +3,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import ba
-from bastd.gameutils import SharedObjects
+import babase
+import bauiv1 as bui
+import bascenev1 as bs
+from bascenev1lib.gameutils import SharedObjects
 
 if TYPE_CHECKING:
     from typing import Any, List, Dict
 
-class mapdefs:
-    points = {}
-    # noinspection PyDictCreation
-    boxes = {}
-    boxes['area_of_interest_bounds'] = (-1.045859963, 12.67722855,
-                                        -5.401537075) + (0.0, 0.0, 0.0) + (
-                                            42.46156851, 20.94044653, 0.6931564611)
-    points['ffa_spawn1'] = (-9.295167711, 8.010664315,
-                            -5.44451005) + (1.555840357, 1.453808816, 0.1165648888)
-    points['ffa_spawn2'] = (7.484707127, 8.172681752, -5.614479365) + (
-        1.553861796, 1.453808816, 0.04419853907)
-    points['ffa_spawn3'] = (9.55724115, 11.30789446, -5.614479365) + (
-        1.337925849, 1.453808816, 0.04419853907)
-    points['ffa_spawn4'] = (-11.55747023, 10.99170684, -5.614479365) + (
-        1.337925849, 1.453808816, 0.04419853907)
-    points['ffa_spawn5'] = (-1.878892369, 9.46490571, -5.614479365) + (
-        1.337925849, 1.453808816, 0.04419853907)
-    points['ffa_spawn6'] = (-0.4912812943, 5.077006397, -5.521672101) + (
-        1.878332089, 1.453808816, 0.007578097856)
-    points['flag1'] = (-11.75152479, 8.057427485, -5.52)
-    points['flag2'] = (9.840909039, 8.188634282, -5.52)
-    points['flag3'] = (-0.2195258696, 5.010273907, -5.52)
-    points['flag4'] = (-0.04605809154, 12.73369108, -5.52)
-    points['flag_default'] = (-0.04201942896, 12.72374492, -5.52)
-    boxes['map_bounds'] = (-0.8748348681, 9.212941713, -5.729538885) + (
-        0.0, 0.0, 0.0) + (42.09666006, 26.19950145, 7.89541168)
-    points['powerup_spawn1'] = (1.160232442, 6.745963662, -5.469115985)
-    points['powerup_spawn2'] = (-1.899700206, 10.56447241, -5.505721177)
-    points['powerup_spawn3'] = (10.56098871, 12.25165669, -5.576232453)
-    points['powerup_spawn4'] = (-12.33530337, 12.25165669, -5.576232453)
-    points['spawn1'] = (-9.295167711, 8.010664315,
-                        -5.44451005) + (1.555840357, 1.453808816, 0.1165648888)
-    points['spawn2'] = (7.484707127, 8.172681752,
-                        -5.614479365) + (1.553861796, 1.453808816, 0.04419853907)
-    points['spawn_by_flag1'] = (-9.295167711, 8.010664315, -5.44451005) + (
-        1.555840357, 1.453808816, 0.1165648888)
-    points['spawn_by_flag2'] = (7.484707127, 8.172681752, -5.614479365) + (
-        1.553861796, 1.453808816, 0.04419853907)
-    points['spawn_by_flag3'] = (-1.45994593, 5.038762459, -5.535288724) + (
-        0.9516389866, 0.6666414677, 0.08607244075)
-    points['spawn_by_flag4'] = (0.4932087091, 12.74493212, -5.598987003) + (
-        0.5245740665, 0.5245740665, 0.01941146064)
-class CreativeThoughts(ba.Map):
+class CreativeThoughts(bs.Map):
     """Freaking map by smoothy."""
 
-    defs = mapdefs
+    from bascenev1lib.mapdata import happy_thoughts as defs
 
     name = 'Creative Thoughts'
 
@@ -72,26 +32,26 @@ class CreativeThoughts(ba.Map):
     @classmethod
     def on_preload(cls) -> Any:
         data: Dict[str, Any] = {
-            'model': ba.getmodel('alwaysLandLevel'),
-            'bottom_model': ba.getmodel('alwaysLandLevelBottom'),
-            'bgmodel': ba.getmodel('alwaysLandBG'),
-            'collide_model': ba.getcollidemodel('alwaysLandLevelCollide'),
-            'tex': ba.gettexture('alwaysLandLevelColor'),
-            'bgtex': ba.gettexture('alwaysLandBGColor'),
-            'vr_fill_mound_model': ba.getmodel('alwaysLandVRFillMound'),
-            'vr_fill_mound_tex': ba.gettexture('vrFillMound')
+            'mesh': bs.getmesh('alwaysLandLevel'),
+            'bottom_mesh': bs.getmesh('alwaysLandLevelBottom'),
+            'bgmesh': bs.getmesh('alwaysLandBG'),
+            'collision_mesh': bs.getcollisionmesh('alwaysLandLevelCollide'),
+            'tex': bs.gettexture('alwaysLandLevelColor'),
+            'bgtex': bs.gettexture('alwaysLandBGColor'),
+            'vr_fill_mound_mesh': bs.getmesh('alwaysLandVRFillMound'),
+            'vr_fill_mound_tex': bs.gettexture('vrFillMound')
         }
         return data
 
     @classmethod
-    def get_music_type(cls) -> ba.MusicType:
-        return ba.MusicType.FLYING
+    def get_music_type(cls) -> bs.MusicType:
+        return bs.MusicType.FLYING
 
     def __init__(self) -> None:
         super().__init__(vr_overlay_offset=(0, -3.7, 2.5))
         shared = SharedObjects.get()
-        self._fake_wall_material=ba.Material()
-        self._real_wall_material=ba.Material()
+        self._fake_wall_material=bs.Material()
+        self._real_wall_material=bs.Material()
         self._fake_wall_material.add_actions(
             conditions=(('they_are_younger_than',9000),'and',('they_have_material', shared.player_material)),
             actions=(
@@ -106,53 +66,75 @@ class CreativeThoughts(ba.Map):
                 ('modify_part_collision', 'physical', True)
 
             ))
-        self.background = ba.newnode(
+        # self.node = bs.newnode(
+        #     'terrain',
+        #     delegate=self,
+        #     attrs={
+        #         'collision_mesh': self.preloaddata['collision_mesh'],
+        #         'mesh': self.preloaddata['mesh'],
+        #         'color_texture': self.preloaddata['tex'],
+        #         'materials': [shared.footing_material,self._fake_wall_material]
+        #     })
+        # self.bottom = bs.newnode('terrain',
+        #                          attrs={
+        #                              'mesh': self.preloaddata['bottom_mesh'],
+        #                              'lighting': False,
+        #                              'color_texture': self.preloaddata['tex']
+        #                          })
+        self.background = bs.newnode(
             'terrain',
             attrs={
-                'model': self.preloaddata['bgmodel'],
+                'mesh': self.preloaddata['bgmesh'],
                 'lighting': False,
                 'background': True,
-                'color_texture': ba.gettexture("rampageBGColor")
+                'color_texture': bs.gettexture("rampageBGColor")
             })
+        # bs.newnode('terrain',
+        #            attrs={
+        #                'mesh': self.preloaddata['vr_fill_mound_mesh'],
+        #                'lighting': False,
+        #                'vr_only': True,
+        #                'color': (0.2, 0.25, 0.2),
+        #                'background': True,
+        #                'color_texture': self.preloaddata['vr_fill_mound_tex']
+        #            })
 
-        self.leftwall=ba.newnode('region',attrs={'position': (-17.75152479, 13, -5.52),'scale': (0.1,15.5,2),'type': 'box','materials': [shared.footing_material,self._real_wall_material ]})
-        self.rightwall=ba.newnode('region',attrs={'position': (17.75, 13, -5.52),'scale': (0.1,15.5,2),'type': 'box','materials': [shared.footing_material,self._real_wall_material ]})
-        self.topwall=ba.newnode('region',attrs={'position': (0, 21.0, -5.52),'scale': (35.4,0.2,2),'type': 'box','materials': [shared.footing_material,self._real_wall_material ]})
-        ba.newnode('locator', attrs={'shape':'box', 'position':(-17.75152479, 13, -5.52), 'color':(0,0,0), 'opacity':1,'draw_beauty':True,'additive':False,'size':(0.1,15.5,2)})
-        ba.newnode('locator', attrs={'shape':'box', 'position':(17.75, 13, -5.52), 'color':(0,0,0), 'opacity':1,'draw_beauty':True,'additive':False,'size':(0.1,15.5,2)})
-        ba.newnode('locator', attrs={'shape':'box', 'position':(0, 21.0, -5.52), 'color':(0,0,0), 'opacity':1,'draw_beauty':True,'additive':False,'size':(35.4,0.2,2)})
-        
-        # self.node_text_left = ba.newnode('text',
-        #                        attrs={
-        #                            'text': "|\n|\n|\n|\n|\n\n\n\n|\n|\n|\n|\n End here \n|\n|\n|\n|\n|\n|\n|\n\n\n\n|\n|\n",
-        #                            'in_world': True,
-        #                            'shadow': 1.0,
-        #                            'flatness': 1.0,
-        #                            'scale':0.019,
-        #                            'h_align': 'center',
-        #                            'position':(-18,20,-5)
-        #                        })
-        # self.node_text_right = ba.newnode('text',
-        #                        attrs={
-        #                            'text': "|\n|\n|\n|\n|\n\n\n\n|\n|\n|\n|\n End here \n|\n|\n|\n|\n|\n|\n|\n\n\n\n|\n|\n",
-        #                            'in_world': True,
-        #                            'shadow': 1.0,
-        #                            'flatness': 1.0,
-        #                            'scale':0.019,
-        #                            'h_align': 'center',
-        #                            'position':(17,20,-5)
-        #                        })
-        # self.node_text_top = ba.newnode('text',
-        #                        attrs={
-        #                            'text': "_ _  _ _  _  _ _ _ _         _ _ _    _ _ _ _          _ _ _ _   _ _   _ _ _  _ _      _ _ _",
-        #                            'in_world': True,
-        #                            'shadow': 1.0,
-        #                            'flatness': 1.0,
-        #                            'scale':0.019,
-        #                            'h_align': 'center',
-        #                            'position':(0,21,-5)
-        #                        })
-        gnode = ba.getactivity().globalsnode
+
+
+        self.leftwall=bs.newnode('region',attrs={'position': (-18.75152479, 21.057427485, -5.52),'scale': (2,42,6),'type': 'box','materials': [shared.footing_material,self._real_wall_material ]})
+        self.rightwall=bs.newnode('region',attrs={'position': (17.65152479, 21.057427485, -5.52),'scale': (2,42,6),'type': 'box','materials': [shared.footing_material,self._real_wall_material ]})
+        self.topwall=bs.newnode('region',attrs={'position': (-18.65152479, 21.057427485, -5.52),'scale': (72,2,6),'type': 'box','materials': [shared.footing_material,self._real_wall_material ]})
+        self.node_text_left = bs.newnode('text',
+                               attrs={
+                                   'text': "|\n|\n|\n|\n|\n\n\n\n|\n|\n|\n|\n End here \n|\n|\n|\n|\n|\n|\n|\n\n\n\n|\n|\n",
+                                   'in_world': True,
+                                   'shadow': 1.0,
+                                   'flatness': 1.0,
+                                   'scale':0.019,
+                                   'h_align': 'center',
+                                   'position':(-18,20,-5)
+                               })
+        self.node_text_right = bs.newnode('text',
+                               attrs={
+                                   'text': "|\n|\n|\n|\n|\n\n\n\n|\n|\n|\n|\n End here \n|\n|\n|\n|\n|\n|\n|\n\n\n\n|\n|\n",
+                                   'in_world': True,
+                                   'shadow': 1.0,
+                                   'flatness': 1.0,
+                                   'scale':0.019,
+                                   'h_align': 'center',
+                                   'position':(17,20,-5)
+                               })
+        self.node_text_top = bs.newnode('text',
+                               attrs={
+                                   'text': "_ _  _ _  _  _ _ _ _         _ _ _    _ _ _ _          _ _ _ _   _ _   _ _ _  _ _      _ _ _",
+                                   'in_world': True,
+                                   'shadow': 1.0,
+                                   'flatness': 1.0,
+                                   'scale':0.019,
+                                   'h_align': 'center',
+                                   'position':(0,21,-5)
+                               })
+        gnode = bs.getactivity().globalsnode
         gnode.happy_thoughts_mode = True
         gnode.shadow_offset = (0.0, 8.0, 5.0)
         gnode.tint = (1.3, 1.23, 1.0)
@@ -163,9 +145,9 @@ class CreativeThoughts(ba.Map):
         self.is_flying = True
 
         # throw out some tips on flying
-        txt = ba.newnode('text',
+        txt = bs.newnode('text',
                          attrs={
-                             'text': ba.Lstr(resource='pressJumpToFlyText'),
+                             'text': babase.Lstr(resource='pressJumpToFlyText'),
                              'scale': 1.2,
                              'maxwidth': 800,
                              'position': (0, 200),
@@ -174,7 +156,7 @@ class CreativeThoughts(ba.Map):
                              'h_align': 'center',
                              'v_attach': 'bottom'
                          })
-        cmb = ba.newnode('combine',
+        cmb = bs.newnode('combine',
                          owner=txt,
                          attrs={
                              'size': 4,
@@ -182,10 +164,10 @@ class CreativeThoughts(ba.Map):
                              'input1': 0.9,
                              'input2': 0.0
                          })
-        ba.animate(cmb, 'input3', {3.0: 0, 4.0: 1, 9.0: 1, 10.0: 0})
+        bs.animate(cmb, 'input3', {3.0: 0, 4.0: 1, 9.0: 1, 10.0: 0})
         cmb.connectattr('output', txt, 'color')
-        ba.timer(10.0, txt.delete)
+        bs.timer(10.0, txt.delete)
 
 
 
-ba._map.register_map(CreativeThoughts)
+bs._map.register_map(CreativeThoughts)

@@ -12,20 +12,10 @@ import functools
 from enum import Enum
 from typing import TYPE_CHECKING, cast, TypeVar, Generic
 
-_pytz_utc: Any
-
-# We don't *require* pytz, but we want to support it for tzinfos if available.
-try:
-    import pytz
-
-    _pytz_utc = pytz.utc
-except ModuleNotFoundError:
-    _pytz_utc = None  # pylint: disable=invalid-name
-
 if TYPE_CHECKING:
     import asyncio
     from efro.call import Call as Call  # 'as Call' so we re-export.
-    from typing import Any, Callable, NoReturn
+    from typing import Any, Callable
 
 T = TypeVar('T')
 ValT = TypeVar('ValT')
@@ -39,11 +29,46 @@ class _EmptyObj:
     pass
 
 
+# A dead weak-ref should be immutable, right? So we can create exactly
+# one and return it for all cases that need an empty weak-ref.
+_g_empty_weak_ref = weakref.ref(_EmptyObj())
+assert _g_empty_weak_ref() is None
+
+
 # TODO: kill this and just use efro.call.tpartial
 if TYPE_CHECKING:
     Call = Call
 else:
     Call = functools.partial
+
+
+def explicit_bool(val: bool) -> bool:
+    """Return a non-inferable boolean value.
+
+    Useful to be able to disable blocks of code without type checkers
+    complaining/etc.
+    """
+    # pylint: disable=no-else-return
+    if TYPE_CHECKING:
+        # infer this! <boom>
+        import random
+
+        return random.random() < 0.5
+    else:
+        return val
+
+
+def snake_case_to_title(val: str) -> str:
+    """Given a snake-case string 'foo_bar', returns 'Foo Bar'."""
+    # Kill empty words resulting from leading/trailing/multiple underscores.
+    return ' '.join(w for w in val.split('_') if w).title()
+
+
+def snake_case_to_camel_case(val: str) -> str:
+    """Given a snake-case string 'foo_bar', returns camel-case 'FooBar'."""
+    # Replace underscores with spaces; capitalize words; kill spaces.
+    # Not sure about efficiency, but logically simple.
+    return val.replace('_', ' ').title().replace(' ', '')
 
 
 def enum_by_value(cls: type[EnumT], value: Any) -> EnumT:
@@ -77,29 +102,35 @@ def enum_by_value(cls: type[EnumT], value: Any) -> EnumT:
 
 def check_utc(value: datetime.datetime) -> None:
     """Ensure a datetime value is timezone-aware utc."""
-    if value.tzinfo is not datetime.timezone.utc and (
-        _pytz_utc is None or value.tzinfo is not _pytz_utc
-    ):
+    if value.tzinfo is not datetime.UTC:
         raise ValueError(
-            'datetime value does not have timezone set as'
-            ' datetime.timezone.utc'
+            'datetime value does not have timezone set as datetime.UTC'
         )
 
 
 def utc_now() -> datetime.datetime:
-    """Get offset-aware current utc time.
+    """Get timezone-aware current utc time.
 
-    This should be used for all datetimes getting sent over the network,
-    used with the entity system, etc.
-    (datetime.utcnow() gives a utc time value, but it is not timezone-aware
-    which makes it less safe to use)
+    Just a shortcut for datetime.datetime.now(datetime.UTC).
+    Avoid datetime.datetime.utcnow() which is deprecated and gives naive
+    times.
     """
-    return datetime.datetime.now(datetime.timezone.utc)
+    return datetime.datetime.now(datetime.UTC)
+
+
+def utc_now_naive() -> datetime.datetime:
+    """Get naive utc time.
+
+    This can be used to replace datetime.utcnow(), which is now deprecated.
+    Most all code should migrate to use timezone-aware times instead of
+    this.
+    """
+    return datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
 
 
 def utc_today() -> datetime.datetime:
     """Get offset-aware midnight in the utc time zone."""
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.UTC)
     return datetime.datetime(
         year=now.year, month=now.month, day=now.day, tzinfo=now.tzinfo
     )
@@ -107,7 +138,7 @@ def utc_today() -> datetime.datetime:
 
 def utc_this_hour() -> datetime.datetime:
     """Get offset-aware beginning of the current hour in the utc time zone."""
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.UTC)
     return datetime.datetime(
         year=now.year,
         month=now.month,
@@ -119,7 +150,7 @@ def utc_this_hour() -> datetime.datetime:
 
 def utc_this_minute() -> datetime.datetime:
     """Get offset-aware beginning of current minute in the utc time zone."""
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.UTC)
     return datetime.datetime(
         year=now.year,
         month=now.month,
@@ -135,18 +166,30 @@ def empty_weakref(objtype: type[T]) -> weakref.ref[T]:
     # At runtime, all weakrefs are the same; our type arg is just
     # for the static type checker.
     del objtype  # Unused.
+
     # Just create an object and let it die. Is there a cleaner way to do this?
-    return weakref.ref(_EmptyObj())  # type: ignore
+    # return weakref.ref(_EmptyObj())  # type: ignore
+
+    # Sharing a single ones seems at least a bit better.
+    return _g_empty_weak_ref  # type: ignore
 
 
-def data_size_str(bytecount: int) -> str:
+def data_size_str(bytecount: int, compact: bool = False) -> str:
     """Given a size in bytes, returns a short human readable string.
 
-    This should be 6 or fewer chars for most all sane file sizes.
+    In compact mode this should be 6 or fewer chars for most all
+    sane file sizes.
     """
     # pylint: disable=too-many-return-statements
+
+    # Special case: handle negatives.
+    if bytecount < 0:
+        val = data_size_str(-bytecount, compact=compact)
+        return f'-{val}'
+
     if bytecount <= 999:
-        return f'{bytecount} B'
+        suffix = 'B' if compact else 'bytes'
+        return f'{bytecount} {suffix}'
     kbytecount = bytecount / 1024
     if round(kbytecount, 1) < 10.0:
         return f'{kbytecount:.1f} KB'
@@ -159,7 +202,7 @@ def data_size_str(bytecount: int) -> str:
         return f'{mbytecount:.0f} MB'
     gbytecount = bytecount / (1024 * 1024 * 1024)
     if round(gbytecount, 1) < 10.0:
-        return f'{mbytecount:.1f} GB'
+        return f'{gbytecount:.1f} GB'
     return f'{gbytecount:.0f} GB'
 
 
@@ -189,7 +232,7 @@ class DirtyBit:
         auto_dirty_seconds: float | None = None,
         min_update_interval: float | None = None,
     ):
-        curtime = time.time()
+        curtime = time.monotonic()
         self._retry_interval = retry_interval
         self._auto_dirty_seconds = auto_dirty_seconds
         self._min_update_interval = min_update_interval
@@ -218,15 +261,16 @@ class DirtyBit:
 
     @dirty.setter
     def dirty(self, value: bool) -> None:
-
         # If we're freshly clean, set our next auto-dirty time (if we have
         # one).
         if self._dirty and not value and self._auto_dirty_seconds is not None:
-            self._next_auto_dirty_time = time.time() + self._auto_dirty_seconds
+            self._next_auto_dirty_time = (
+                time.monotonic() + self._auto_dirty_seconds
+            )
 
         # If we're freshly dirty, schedule an immediate update.
         if not self._dirty and value:
-            self._next_update_time = time.time()
+            self._next_update_time = time.monotonic()
 
             # If they want to enforce a minimum update interval,
             # push out the next update time if it hasn't been long enough.
@@ -249,7 +293,7 @@ class DirtyBit:
         Takes into account the amount of time passed since the target
         was marked dirty or since should_update last returned True.
         """
-        curtime = time.time()
+        curtime = time.monotonic()
 
         # Auto-dirty ourself if we're into that.
         if (
@@ -413,8 +457,7 @@ if TYPE_CHECKING:
     class ValueDispatcherMethod(Generic[ValT, RetT]):
         """Used by the valuedispatchmethod decorator."""
 
-        def __call__(self, value: ValT) -> RetT:
-            ...
+        def __call__(self, value: ValT) -> RetT: ...
 
         def register(
             self, value: ValT
@@ -586,7 +629,7 @@ def check_non_optional(obj: T | None) -> T:
     Use assert_non_optional for a more efficient (but less safe) equivalent.
     """
     if obj is None:
-        raise TypeError('Got None value in check_non_optional.')
+        raise ValueError('Got None value in check_non_optional.')
     return obj
 
 
@@ -668,14 +711,25 @@ def compact_id(num: int) -> str:
     )
 
 
-# NOTE: Even though this is available as part of typing_extensions, keeping
-# it in here for now so we don't require typing_extensions as a dependency.
-# Once 3.11 rolls around we can kill this and use typing.assert_never.
-def assert_never(value: NoReturn) -> NoReturn:
-    """Trick for checking exhaustive handling of Enums, etc.
-    See https://github.com/python/typing/issues/735
+def caller_source_location() -> str:
+    """Returns source file name and line of the code calling us.
+
+    Example: 'mymodule.py:23'
     """
-    assert False, f'Unhandled value: {value} ({type(value).__name__})'
+    try:
+        import inspect
+
+        frame = inspect.currentframe()
+        for _i in range(2):
+            if frame is None:
+                raise RuntimeError()
+            frame = frame.f_back
+        if frame is None:
+            raise RuntimeError()
+        fname = os.path.basename(frame.f_code.co_filename)
+        return f'{fname}:{frame.f_lineno}'
+    except Exception:
+        return '<unknown source location>'
 
 
 def unchanging_hostname() -> str:
@@ -704,32 +758,143 @@ def unchanging_hostname() -> str:
     return os.uname().nodename
 
 
-def set_canonical_module(
-    module_globals: dict[str, Any], names: list[str]
-) -> None:
-    """Override any __module__ attrs on passed classes/etc.
+def set_canonical_module_names(module_globals: dict[str, Any]) -> None:
+    """Do the thing."""
+    if os.environ.get('EFRO_SUPPRESS_SET_CANONICAL_MODULE_NAMES') == '1':
+        return
 
-    This allows classes to present themselves using clean paths such as
-    mymodule.MyClass instead of possibly ugly internal ones such as
-    mymodule._internal._stuff.MyClass.
-    """
     modulename = module_globals.get('__name__')
     if not isinstance(modulename, str):
         raise RuntimeError('Unable to get module name.')
-    for name in names:
-        obj = module_globals[name]
+    assert not modulename.startswith('_')
+    modulename_prefix = f'{modulename}.'
+    modulename_prefix_2 = f'_{modulename}.'
+
+    for name, obj in module_globals.items():
+        if name.startswith('_'):
+            continue
         existing = getattr(obj, '__module__', None)
         try:
-            if existing is not None and existing != modulename:
+            # Override the module ONLY if it lives under us somewhere.
+            # So ourpackage._submodule.Foo becomes ourpackage.Foo
+            # but otherpackage._submodule.Foo remains untouched.
+            if existing is not None and (
+                existing.startswith(modulename_prefix)
+                or existing.startswith(modulename_prefix_2)
+            ):
                 obj.__module__ = modulename
         except Exception:
             import logging
 
             logging.warning(
-                'set_canonical_module: unable to change __module__'
+                'set_canonical_module_names: unable to change __module__'
                 " from '%s' to '%s' on %s object at '%s'.",
                 existing,
                 modulename,
                 type(obj),
                 name,
             )
+
+
+def timedelta_str(
+    timeval: datetime.timedelta | float, maxparts: int = 2, decimals: int = 0
+) -> str:
+    """Return a simple human readable time string for a length of time.
+
+    Time can be given as a timedelta or a float representing seconds.
+    Example output:
+      "23d 1h 2m 32s" (with maxparts == 4)
+      "23d 1h" (with maxparts == 2)
+      "23d 1.08h" (with maxparts == 2 and decimals == 2)
+
+    Note that this is hard-coded in English and probably not especially
+    performant.
+    """
+    # pylint: disable=too-many-locals
+
+    if isinstance(timeval, float):
+        timevalfin = datetime.timedelta(seconds=timeval)
+    else:
+        timevalfin = timeval
+
+    # Internally we only handle positive values.
+    if timevalfin.total_seconds() < 0:
+        return f'-{timedelta_str(timeval=-timeval, maxparts=maxparts)}'
+
+    years = timevalfin.days // 365
+    days = timevalfin.days % 365
+    hours = timevalfin.seconds // 3600
+    hour_remainder = timevalfin.seconds % 3600
+    minutes = hour_remainder // 60
+    seconds = hour_remainder % 60
+
+    # Now, if we want decimal places for our last value,
+    # calc fractional parts.
+    if decimals:
+        # Calc totals of each type.
+        t_seconds = timevalfin.total_seconds()
+        t_minutes = t_seconds / 60
+        t_hours = t_minutes / 60
+        t_days = t_hours / 24
+        t_years = t_days / 365
+
+        # Calc fractional parts that exclude all whole values to their left.
+        years_covered = years
+        years_f = t_years - years_covered
+        days_covered = years_covered * 365 + days
+        days_f = t_days - days_covered
+        hours_covered = days_covered * 24 + hours
+        hours_f = t_hours - hours_covered
+        minutes_covered = hours_covered * 60 + minutes
+        minutes_f = t_minutes - minutes_covered
+        seconds_covered = minutes_covered * 60 + seconds
+        seconds_f = t_seconds - seconds_covered
+    else:
+        years_f = days_f = hours_f = minutes_f = seconds_f = 0.0
+
+    parts: list[str] = []
+    for part, part_f, suffix in (
+        (years, years_f, 'y'),
+        (days, days_f, 'd'),
+        (hours, hours_f, 'h'),
+        (minutes, minutes_f, 'm'),
+        (seconds, seconds_f, 's'),
+    ):
+        if part or parts or (not parts and suffix == 's'):
+            # Do decimal version only for the last part.
+            if decimals and (len(parts) >= maxparts - 1 or suffix == 's'):
+                parts.append(f'{part+part_f:.{decimals}f}{suffix}')
+            else:
+                parts.append(f'{part}{suffix}')
+            if len(parts) >= maxparts:
+                break
+    return ' '.join(parts)
+
+
+def ago_str(
+    timeval: datetime.datetime,
+    maxparts: int = 1,
+    now: datetime.datetime | None = None,
+    decimals: int = 0,
+) -> str:
+    """Given a datetime, return a clean human readable 'ago' str.
+
+    Note that this is hard-coded in English so should not be used
+    for visible in-game elements; only tools/etc.
+
+    If now is not passed, efro.util.utc_now() is used.
+    """
+    if now is None:
+        now = utc_now()
+    return (
+        timedelta_str(now - timeval, maxparts=maxparts, decimals=decimals)
+        + ' ago'
+    )
+
+
+def split_list(input_list: list[T], max_length: int) -> list[list[T]]:
+    """Split a single list into smaller lists."""
+    return [
+        input_list[i : i + max_length]
+        for i in range(0, len(input_list), max_length)
+    ]

@@ -32,15 +32,18 @@ class HostConfig:
     user: str = 'ubuntu'
     port: int = 22
     mosh_port: int | None = None
+    mosh_port_2: int | None = None
     mosh_server_path: str | None = None
     mosh_shell: str = 'sh'
     workspaces_root: str = '/home/${USER}/cloudshell_workspaces'
     sync_perms: bool = True
-    precommand: str | None = None
+    precommand_noninteractive: str | None = None
+    precommand_interactive: str | None = None
     managed: bool = False
+    region: str | None = None
     idle_minutes: int = 5
     can_sudo_reboot: bool = False
-    max_sessions: int = 3
+    max_sessions: int = 4
     reboot_wait_seconds: int = 20
     reboot_attempts: int = 1
 

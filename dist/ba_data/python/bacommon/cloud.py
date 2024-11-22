@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, override
 from enum import Enum
 
 from efro.message import Message, Response
@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 class LoginProxyRequestMessage(Message):
     """Request send to the cloud to ask for a login-proxy."""
 
+    @override
     @classmethod
     def get_response_types(cls) -> list[type[Response] | None]:
         return [LoginProxyRequestResponse]
@@ -31,8 +32,11 @@ class LoginProxyRequestMessage(Message):
 class LoginProxyRequestResponse(Response):
     """Response to a request for a login proxy."""
 
-    # URL to direct the user to for login.
+    # URL to direct the user to for sign in.
     url: Annotated[str, IOAttrs('u')]
+
+    # URL to use for overlay-web-browser sign ins.
+    url_overlay: Annotated[str, IOAttrs('uo')]
 
     # Proxy-Login id for querying results.
     proxyid: Annotated[str, IOAttrs('p')]
@@ -49,6 +53,7 @@ class LoginProxyStateQueryMessage(Message):
     proxyid: Annotated[str, IOAttrs('p')]
     proxykey: Annotated[str, IOAttrs('k')]
 
+    @override
     @classmethod
     def get_response_types(cls) -> list[type[Response] | None]:
         return [LoginProxyStateQueryResponse]
@@ -85,6 +90,7 @@ class LoginProxyCompleteMessage(Message):
 class PingMessage(Message):
     """Standard ping."""
 
+    @override
     @classmethod
     def get_response_types(cls) -> list[type[Response] | None]:
         return [PingResponse]
@@ -103,6 +109,7 @@ class TestMessage(Message):
 
     testfoo: Annotated[int, IOAttrs('f')]
 
+    @override
     @classmethod
     def get_response_types(cls) -> list[type[Response] | None]:
         return [TestResponse]
@@ -114,6 +121,29 @@ class TestResponse(Response):
     """Here's that workspace you asked for, boss."""
 
     testfoo: Annotated[int, IOAttrs('f')]
+
+
+@ioprepped
+@dataclass
+class SendInfoMessage(Message):
+    """User is using the send-info function"""
+
+    description: Annotated[str, IOAttrs('c')]
+
+    @override
+    @classmethod
+    def get_response_types(cls) -> list[type[Response] | None]:
+        return [SendInfoResponse]
+
+
+@ioprepped
+@dataclass
+class SendInfoResponse(Response):
+    """Response to sending into the server."""
+
+    handled: Annotated[bool, IOAttrs('v')]
+    message: Annotated[str | None, IOAttrs('m', store_default=False)] = None
+    legacy_code: Annotated[str | None, IOAttrs('l', store_default=False)] = None
 
 
 @ioprepped
@@ -136,6 +166,7 @@ class WorkspaceFetchMessage(Message):
     workspaceid: Annotated[str, IOAttrs('w')]
     state: Annotated[WorkspaceFetchState, IOAttrs('s')]
 
+    @override
     @classmethod
     def get_response_types(cls) -> list[type[Response] | None]:
         return [WorkspaceFetchResponse]
@@ -162,6 +193,7 @@ class WorkspaceFetchResponse(Response):
 class MerchAvailabilityMessage(Message):
     """Can we show merch link?"""
 
+    @override
     @classmethod
     def get_response_types(cls) -> list[type[Response] | None]:
         return [MerchAvailabilityResponse]
@@ -187,6 +219,7 @@ class SignInMessage(Message):
     description: Annotated[str, IOAttrs('d', soft_default='-')]
     apptime: Annotated[float, IOAttrs('at', soft_default=-1.0)]
 
+    @override
     @classmethod
     def get_response_types(cls) -> list[type[Response] | None]:
         return [SignInResponse]
@@ -205,6 +238,7 @@ class SignInResponse(Response):
 class ManageAccountMessage(Message):
     """Message asking for a manage-account url."""
 
+    @override
     @classmethod
     def get_response_types(cls) -> list[type[Response] | None]:
         return [ManageAccountResponse]

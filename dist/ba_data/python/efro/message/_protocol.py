@@ -96,7 +96,6 @@ class MessageProtocol:
             type[Response] | type[SysResponse], int
         ] = {}
         for m_id, m_type in message_types.items():
-
             # Make sure only valid message types were passed and each
             # id was assigned only once.
             assert isinstance(m_id, int)
@@ -331,7 +330,7 @@ class MessageProtocol:
         for module, names in sorted(imports.items()):
             jnames = ', '.join(names)
             line = f'from {module} import {jnames}'
-            if len(line) > 79:
+            if len(line) > 80:
                 # Recreate in a wrapping-friendly form.
                 line = f'from {module} import ({jnames})'
             import_lines += f'{line}\n'
@@ -345,24 +344,24 @@ class MessageProtocol:
 
         if part == 'sender':
             import_lines += (
-                'from efro.message import MessageSender, BoundMessageSender'
+                'from efro.message import MessageSender, BoundMessageSender\n'
             )
             tpimport_typing_extras = ''
         else:
             if single_message_type:
                 import_lines += (
                     'from efro.message import (MessageReceiver,'
-                    ' BoundMessageReceiver, Message, Response)'
+                    ' BoundMessageReceiver, Message, Response)\n'
                 )
             else:
                 import_lines += (
                     'from efro.message import MessageReceiver,'
-                    ' BoundMessageReceiver'
+                    ' BoundMessageReceiver\n'
                 )
             tpimport_typing_extras = ', Awaitable'
 
         if extra_import_code is not None:
-            import_lines += f'\n{extra_import_code}\n'
+            import_lines += extra_import_code
 
         ovld = ', overload' if not single_message_type else ''
         ovld2 = (
@@ -387,7 +386,7 @@ class MessageProtocol:
             f'\n'
             f'from typing import TYPE_CHECKING{ovld}{ovld2}\n'
             f'\n'
-            f'{import_lines}\n'
+            f'{import_lines}'
             f'\n'
             f'if TYPE_CHECKING:\n'
             f'    from typing import {baseimps_s}'
@@ -485,7 +484,6 @@ class MessageProtocol:
                         out += f'        return cast({rtypevar}, out)\n'
 
                 else:
-
                     for msgtype in msgtypes:
                         msgtypevar = msgtype.__name__
                         rtypes = msgtype.get_response_types()
@@ -500,8 +498,7 @@ class MessageProtocol:
                             f'    @overload\n'
                             f'    {pfx}def send{sfx}(self,'
                             f' message: {msgtypevar})'
-                            f' -> {rtypevar}:\n'
-                            f'        ...\n'
+                            f' -> {rtypevar}: ...\n'
                         )
                     rtypevar = 'Response | None'
                     if async_pass:
@@ -608,8 +605,7 @@ class MessageProtocol:
                         f'        call: Callable[[Any, {msgtypevar}], '
                         f'{rtypevar}],\n'
                         f'    )'
-                        f' -> Callable[[Any, {msgtypevar}], {rtypevar}]:\n'
-                        f'        ...\n'
+                        f' -> Callable[[Any, {msgtypevar}], {rtypevar}]: ...\n'
                     )
                 out += (
                     '\n'

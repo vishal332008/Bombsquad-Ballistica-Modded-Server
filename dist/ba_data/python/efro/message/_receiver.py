@@ -55,12 +55,13 @@ class MessageReceiver:
     def __init__(self, protocol: MessageProtocol) -> None:
         self.protocol = protocol
         self._handlers: dict[type[Message], Callable] = {}
-        self._decode_filter_call: Callable[
-            [Any, dict, Message], None
-        ] | None = None
-        self._encode_filter_call: Callable[
-            [Any, Message | None, Response | SysResponse, dict], None
-        ] | None = None
+        self._decode_filter_call: (
+            Callable[[Any, dict, Message], None] | None
+        ) = None
+        self._encode_filter_call: (
+            Callable[[Any, Message | None, Response | SysResponse, dict], None]
+            | None
+        ) = None
 
     # noinspection PyProtectedMember
     def register_handler(
@@ -73,7 +74,7 @@ class MessageReceiver:
         """
         # TODO: can use types.GenericAlias in 3.9.
         # (hmm though now that we're there,  it seems a drop-in
-        # replace gives us errors. Should re-test in 3.10 as it seems
+        # replace gives us errors. Should re-test in 3.11 as it seems
         # that typing_extensions handles it differently in that case)
         from typing import _GenericAlias  # type: ignore
         from typing import get_type_hints, get_args
@@ -141,6 +142,7 @@ class MessageReceiver:
 
         # This will contain NoneType for empty return cases, but
         # we expect it to be None.
+        # noinspection PyPep8
         responsetypes = tuple(
             None if r is type(None) else r for r in responsetypes
         )
@@ -309,7 +311,9 @@ class MessageReceiver:
                         msgtype.__qualname__,
                     )
                 else:
-                    logging.exception('Error in efro.message handling.')
+                    logging.exception(
+                        'Error handling raw efro.message. msg=%s', msg
+                    )
             return rstr
 
     def handle_raw_message_async(
@@ -366,7 +370,12 @@ class MessageReceiver:
                     msgtype.__qualname__,
                 )
             else:
-                logging.exception('Error in efro.message handling.')
+                logging.exception(
+                    'Error handling raw async efro.message.'
+                    ' msgtype=%s msg_decoded=%s.',
+                    msgtype,
+                    msg_decoded,
+                )
         return rstr
 
     async def _handle_raw_message_async(

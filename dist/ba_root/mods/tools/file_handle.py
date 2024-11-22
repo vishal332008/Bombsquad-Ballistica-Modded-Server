@@ -1,6 +1,6 @@
 """Module to handle operations with file."""
 
-# ba_meta require api 7
+# ba_meta require api 8
 # (see https://ballistica.net/wiki/meta-tag-system)
 
 
@@ -8,15 +8,13 @@ from __future__ import annotations
 
 __all__ = ["OpenJson", "JsonFile", "PathNotExistsError"]
 
-
-from typing import TYPE_CHECKING
-from dataclasses import dataclass
-
 import json
 import os
 import re
+from dataclasses import dataclass
 
 from filelock import FileLock
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     pass
@@ -66,7 +64,7 @@ class JsonFile:
             output = json.dumps(data, indent=4)
             output2 = re.sub(r'": \[\s+', '": [', output)
             output3 = re.sub(r'",\s+', '", ', output2)
-            output4 = re.sub(r'"\s+\]', '"]', output3)
+            output4 = re.sub(r'"\s+]', '"]', output3)
 
             with open(self.path, mode="w", encoding="utf-8") as json_file:
                 json_file.write(output4)
