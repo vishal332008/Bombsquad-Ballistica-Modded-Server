@@ -4,10 +4,6 @@
 # pylint: disable=too-many-lines
 """BallisticaKit server manager."""
 from __future__ import annotations
-from efro.terminal import Clr
-from efro.error import CleanError
-from efro.dataclassio import dataclass_from_dict, dataclass_validate
-from bacommon.servermanager import ServerConfig, StartServerModeCommand
 
 import os
 import sys
@@ -29,6 +25,10 @@ sys.path += [
     str(Path(Path(__file__).parent, 'dist', 'ba_data', 'python-site-packages')),
 ]
 
+from efro.terminal import Clr
+from efro.error import CleanError
+from efro.dataclassio import dataclass_from_dict, dataclass_validate
+from bacommon.servermanager import ServerConfig, StartServerModeCommand
 
 if TYPE_CHECKING:
     from types import FrameType
