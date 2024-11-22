@@ -1,11 +1,11 @@
 # Bombsquad-Ballistica-Modded-Server
 
-Modded server scripts to host ballistica (Bombsquad) server. Running on BS1.7.26
+Modded server scripts to host ballistica (Bombsquad) server. Running on BS1.7.37
 
 ``
-We started working on API 8 , help us to test out and fix bugs 
+Migrated from API 7 TO API 8 , this might be unstable and missing some features. Use API 7 from this tag
 ``
-[API8 BRANCH](https://github.com/imayushsaini/Bombsquad-Ballistica-Modded-Server/tree/api8)
+[API7 ](https://github.com/imayushsaini/Bombsquad-Ballistica-Modded-Server/releases/tag/1.7.26)
 
 # Prerequisites
 - Basic knowledge of Linux
@@ -26,9 +26,9 @@ Add python Deadsnakes PPA
 ```
 sudo add-apt-repository ppa:deadsnakes/ppa
 ```
-Install Python 3.11
+Install Python 3.12
 ```
-sudo apt install python3-pip python3.10-dev python3.10-venv
+sudo apt install python3-pip python3.12-dev python3.12-venv
 ```
 Create a tmux session.
 ```
