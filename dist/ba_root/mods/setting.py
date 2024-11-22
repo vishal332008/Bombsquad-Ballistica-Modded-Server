@@ -48,11 +48,14 @@ def commit(data: dict) -> None:
     if is_invalid_time_format(data['autoNightMode']['startTime']) or is_invalid_time_format(data['autoNightMode']['endTime']):
         data['autoNightMode']['startTime'] = "18:30"
         data['autoNightMode']['endTime'] = "6:30"
-        print("Invalid time setting , resetting night mode time")
+
+    print("Invalid time setting , resetting night mode time")
+
     with open(SETTINGS_PATH, mode="w", encoding="utf-8") as setting_file:
         json.dump(data, setting_file, indent=4)
     # settings updated ok now update the cache
     refresh_cache()
+
 
 def is_invalid_time_format(time_string, time_format='%H:%M'):
     try:

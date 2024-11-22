@@ -1,3 +1,5 @@
+from .handlers import send
+from tools import playlist
 import random
 
 import _babase
@@ -10,8 +12,7 @@ from serverdata import serverdata
 import babase
 import bascenev1 as bs
 from tools import logger
-from tools import playlist
-from .handlers import send
+
 
 Commands = ['recents', 'info', 'createteam', 'showid', 'hideid', 'lm', 'gp',
             'party', 'quit', 'kickvote', 'maxplayers', 'playlist', 'ban',
@@ -91,6 +92,9 @@ def ExcelCommand(command, arguments, clientid, accountid):
 
     elif command in ['dv', 'day']:
         dv(arguments)
+
+    elif command == 'tint':
+        tint(arguments)
 
     elif command in ['pause', 'pausegame']:
         pause()
@@ -259,7 +263,7 @@ def get_profiles(arguments, clientid):
         playerID = int(arguments[0])
         num = 1
         for i in bs.get_foreground_host_session().sessionplayers[
-            playerID].inputdevice.get_player_profiles():
+                playerID].inputdevice.get_player_profiles():
             try:
                 send(f"{num})-  {i}", clientid)
                 num += 1
@@ -418,6 +422,16 @@ def dv(arguments):
             return
         else:
             pass
+
+
+def tint(arguments):
+
+    activity = _babase.get_foreground_host_activity()
+
+    if len(arguments) == 3:
+        if all(isinstance(val, (int, float)) for val in arguments):
+            activity.globalsnode.tint = (
+                arguments[0], arguments[1], arguments[2])
 
 
 def pause():

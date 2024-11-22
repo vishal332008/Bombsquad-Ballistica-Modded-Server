@@ -1,3 +1,5 @@
+import ecdsa
+import _babase
 import base64
 import json
 import os
@@ -7,8 +9,6 @@ import string
 import time
 from datetime import datetime
 date_format = '%Y-%m-%d %H:%M:%S'
-import _babase
-import ecdsa
 
 vapidkeys = {}
 subscriptions = {}
@@ -51,7 +51,7 @@ def send_push_notification(subscription, payload):
                 vapid_private_key=get_vapid_keys()["private_key"],
                 vapid_claims={
                     'sub': 'mailto:{}'.format("test@ballistica.net"),
-                })
+        })
         print("Push notification sent successfully")
     except Exception as e:
         print("Error sending push notification:", str(e))
@@ -95,7 +95,8 @@ def player_joined(pb_id):
         if "last_notification" in subscribed_players[pb_id] and (now - datetime.strptime(subscribed_players[pb_id]["last_notification"], date_format)).seconds < 15 * 60:
             pass
         else:
-            subscribed_players[pb_id]["last_notification"] = now.strftime(date_format)
+            subscribed_players[pb_id]["last_notification"] = now.strftime(
+                date_format)
             subscribes = subscribed_players[pb_id]["subscribers"]
             for subscriber_id in subscribes:
                 sub = subscriptions[subscriber_id]

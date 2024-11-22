@@ -4,6 +4,10 @@
 # pylint: disable=too-many-lines
 """BallisticaKit server manager."""
 from __future__ import annotations
+from efro.terminal import Clr
+from efro.error import CleanError
+from efro.dataclassio import dataclass_from_dict, dataclass_validate
+from bacommon.servermanager import ServerConfig, StartServerModeCommand
 
 import os
 import sys
@@ -25,10 +29,6 @@ sys.path += [
     str(Path(Path(__file__).parent, 'dist', 'ba_data', 'python-site-packages')),
 ]
 
-from bacommon.servermanager import ServerConfig, StartServerModeCommand
-from efro.dataclassio import dataclass_from_dict, dataclass_validate
-from efro.error import CleanError
-from efro.terminal import Clr
 
 if TYPE_CHECKING:
     from types import FrameType
@@ -413,7 +413,8 @@ class ServerManagerApp:
                     raise CleanError('Expected a config path as next arg.')
                 path = sys.argv[i + 1]
                 if not os.path.exists(path):
-                    raise CleanError(f"Supplied path does not exist: '{path}'.")
+                    raise CleanError(
+                        f"Supplied path does not exist: '{path}'.")
                 # We need an abs path because we may be in a different
                 # cwd currently than we will be during the run.
                 self._user_provided_config_path = os.path.abspath(path)
@@ -547,14 +548,15 @@ class ServerManagerApp:
                 )
                 return
             except Exception as exc:
-                if strict:
-                    raise CleanError(
-                        f'Error loading config file:\n{exc}'
-                    ) from exc
-                print(
-                    f'{Clr.RED}Error loading config file:\n{exc}.{Clr.RST}',
-                    flush=True,
-                )
+
+                print(f'{Clr.RED}Error loading config file:\n{exc}.{Clr.RST}',
+                      flush=True)
+                with open(self._ba_root_path + "/mods/defaults/config.yaml", "r") as infile:
+                    default_file = infile.read()
+                with open(self._config_path, "w") as outfile:
+                    outfile.write(default_file)
+                print("config reset done")
+
                 if trynum == maxtries - 1:
                     print(
                         f'{Clr.RED}Max-tries reached; giving up.'
@@ -795,8 +797,10 @@ class ServerManagerApp:
             bincfg = {}
 
         # Some of our config values translate directly into the
+
         # ballisticakit config file; the rest we pass at runtime.
         bincfg['Port'] = int(os.environ.get('PORT', self._config.port))
+
         bincfg['Auto Balance Teams'] = self._config.auto_balance_teams
         bincfg['Show Tutorial'] = self._config.show_tutorial
 
