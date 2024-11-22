@@ -17,10 +17,10 @@ from tools import logger
 Commands = ['recents', 'info', 'createteam', 'showid', 'hideid', 'lm', 'gp',
             'party', 'quit', 'kickvote', 'maxplayers', 'playlist', 'ban',
             'kick', 'remove', 'end', 'quit', 'mute', 'unmute', 'slowmo', 'nv',
-            'dv', 'pause',
+            'dv', 'pause', 'tint',
             'cameramode', 'createrole', 'addrole', 'removerole', 'addcommand',
             'addcmd', 'removecommand', 'getroles', 'removecmd', 'changetag',
-            'customtag', 'customeffect', 'removeeffect', 'removetag' 'add',
+            'customtag', 'customeffect', 'removeeffect', 'removetag', 'add',
             'spectators', 'lobbytime']
 CommandAliases = ['max', 'rm', 'next', 'restart', 'mutechat', 'unmutechat',
                   'sm',
