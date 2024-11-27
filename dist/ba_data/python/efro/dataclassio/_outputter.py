@@ -38,25 +38,35 @@ class _Outputter:
     """Validates or exports data contained in a dataclass instance."""
 
     def __init__(
-        self, obj: Any, create: bool, codec: Codec, coerce_to_float: bool
+        self,
+        obj: Any,
+        create: bool,
+        codec: Codec,
+        coerce_to_float: bool,
+        discard_extra_attrs: bool,
     ) -> None:
         self._obj = obj
         self._create = create
         self._codec = codec
         self._coerce_to_float = coerce_to_float
+        self._discard_extra_attrs = discard_extra_attrs
 
     def run(self) -> Any:
         """Do the thing."""
 
+        obj = self._obj
+
+        # mypy workaround - if we check 'obj' here it assumes the
+        # isinstance call below fails.
         assert dataclasses.is_dataclass(self._obj)
 
         # For special extended data types, call their 'will_output' callback.
         # FIXME - should probably move this into _process_dataclass so it
         # can work on nested values.
-        if isinstance(self._obj, IOExtendedData):
-            self._obj.will_output()
+        if isinstance(obj, IOExtendedData):
+            obj.will_output()
 
-        return self._process_dataclass(type(self._obj), self._obj, '')
+        return self._process_dataclass(type(obj), obj, '')
 
     def soft_default_check(
         self, value: Any, anntype: Any, fieldpath: str
@@ -133,17 +143,18 @@ class _Outputter:
                 out[storagename] = outvalue
 
         # If there's extra-attrs stored on us, check/include them.
-        extra_attrs = getattr(obj, EXTRA_ATTRS_ATTR, None)
-        if isinstance(extra_attrs, dict):
-            if not _is_valid_for_codec(extra_attrs, self._codec):
-                raise TypeError(
-                    f'Extra attrs on \'{fieldpath}\' contains data type(s)'
-                    f' not supported by \'{self._codec.value}\' codec:'
-                    f' {extra_attrs}.'
-                )
-            if self._create:
-                assert out is not None
-                out.update(extra_attrs)
+        if not self._discard_extra_attrs:
+            extra_attrs = getattr(obj, EXTRA_ATTRS_ATTR, None)
+            if isinstance(extra_attrs, dict):
+                if not _is_valid_for_codec(extra_attrs, self._codec):
+                    raise TypeError(
+                        f'Extra attrs on \'{fieldpath}\' contains data type(s)'
+                        f' not supported by \'{self._codec.value}\' codec:'
+                        f' {extra_attrs}.'
+                    )
+                if self._create:
+                    assert out is not None
+                    out.update(extra_attrs)
 
         # If this obj inherits from multi-type, store its type id.
         if isinstance(obj, IOMultiType):

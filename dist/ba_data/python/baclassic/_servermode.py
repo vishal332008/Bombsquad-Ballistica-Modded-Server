@@ -460,6 +460,6 @@ class ServerController:
             bascenev1.new_host_session(sessiontype)
 
         # Run an access check if we're trying to make a public party.
-        if not self._ran_access_check:
+        if not self._ran_access_check :
             self._run_access_check()
             self._ran_access_check = True

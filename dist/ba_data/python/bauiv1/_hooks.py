@@ -61,13 +61,11 @@ def party_icon_activate(origin: Sequence[float]) -> None:
 
 
 def on_button_press_x() ->None:
-    import ui_hooks
-    ui_hooks.on_button_xy_press("X")
+    print("button X pressed from UI or keyboard")
 
 
 def on_button_press_y() ->None:
-    import ui_hooks
-    ui_hooks.on_button_xy_press("X")
+    print("button Y pressed from UI or keyboard")
 
 
 def quit_window(quit_type: babase.QuitType) -> None:
