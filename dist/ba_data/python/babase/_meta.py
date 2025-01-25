@@ -327,7 +327,7 @@ class DirectoryScan:
         meta_lines = {
             lnum: l[1:].split()
             for lnum, l in enumerate(flines)
-            if l.startswith('# ba_meta ')
+            if '# ba_meta ' in l
         }
         is_top_level = len(subpath.parts) <= 1
         required_api = self._get_api_requirement(
